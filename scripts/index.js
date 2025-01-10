@@ -2,6 +2,7 @@
 
 //в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
 // content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
+
 const cardTemplate = document.querySelector("#card-template").content;
 
 // @todo: DOM узлы
@@ -29,7 +30,9 @@ function initCard(arrayEl, arrayIt, delFunction) {
   //ищем элемент с классом .card__title, присваиваем приваиваем совйству элемента textContent значение аргумента arrayEl
 
   cardElement.querySelector(".card__title").textContent = arrayEl;
-  cardElement.querySelector(".card__image").src = arrayIt;
+  const imgEl = cardElement.querySelector(".card__image");
+  imgEl.src = arrayIt;
+  imgEl.alt = arrayEl;
 
   // ищем элемент с классом .card__delete-button, addEventListener - устанвливает метод с для найденного элемента при событии click
 
@@ -45,7 +48,7 @@ function initCard(arrayEl, arrayIt, delFunction) {
 // @todo: Функция удаления карточки
 
 function deleteCard(event) {
-  let eventElement = event.target;
+  const eventElement = event.target;
   const listItem = eventElement.closest(".places__item");
   listItem.remove();
 }
@@ -58,7 +61,7 @@ function deleteCard(event) {
 initialCards.forEach(function (item) {
   // функция переданная в метод forEach вызывает функцию initCard, которой переданы агрумены:
   //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
-  
+
   let appendCard = initCard(item.name, item.link, deleteCard);
   cardList.append(appendCard);
 });
