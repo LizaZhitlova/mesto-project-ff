@@ -1,7 +1,7 @@
 // webpack.config.js
 const path = require('path'); // подключаем path к конфигу вебпак
-// const HtmlWebpackPlugin = require('html-webpack-plugin'); // подключаем HTML плагин
-// const { CleanWebpackPlugin } = require('clean-webpack-plugin'); // подключили плагин, который будет каждый раз при сборке проекта удалять содержимое папки dist.
+const HtmlWebpackPlugin = require('html-webpack-plugin'); // подключаем HTML плагин
+const { CleanWebpackPlugin } = require('clean-webpack-plugin'); // подключили плагин, который будет каждый раз при сборке проекта удалять содержимое папки dist.
 // // const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // подключаем к проекту плагин  mini-css-extract-plugin, с помощью которого webpack берёт много CSS-файлов и объединяет их в один.
 
 module.exports = {
@@ -47,15 +47,15 @@ module.exports = {
 //     }]
 //   }
           ]
-      }
+      },
 
-    //   plugins: [ //plugins это массив, в который мы передаём объекты опций 
-    //     new HtmlWebpackPlugin({
-    //       template: './src/index.html' // путь к файлу index.html -объект опций 
-    //     }),
-    //     new CleanWebpackPlugin(), // вызываем опцию CleanWebpackPlugin 
-    //     // new MiniCssExtractPlugin(),// подклюсаем опцию для объединения CSS файлов,
-    //   ]
+      plugins: [ //plugins это массив, в который мы передаём объекты опций 
+        new HtmlWebpackPlugin({
+          template: './src/index.html' // путь к файлу index.html -объект опций 
+        }),
+        new CleanWebpackPlugin(), // вызываем опцию CleanWebpackPlugin 
+        // // new MiniCssExtractPlugin(),// подклюсаем опцию для объединения CSS файлов,
+      ]
     
 }
 
