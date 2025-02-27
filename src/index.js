@@ -1,5 +1,6 @@
 
- import "../pages/index.css";// импорт главного файла стилей 
+ import "./index.css";// импорт главного файла стилей 
+ import {initialCards} from './cards.js';
 
 // @todo: Темплейт карточки
 
