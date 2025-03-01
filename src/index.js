@@ -69,3 +69,41 @@ initialCards.forEach(function (item) {
   let appendCard = initCard(item.name, item.link, deleteCard);
   cardList.append(appendCard);
 });
+
+// реализовываем всплывающие окна 
+// const editprofileForm=document.forms.edit-profile; // находим форму edit-profile значение присваиваем переменной editprofileForm
+// const newplaceForm=document.forms.new-place; // находим форму new-place и значение присваиваем  переменной newplaceForm
+const Popup = document.querySelector(".popup");
+const Popupedit = document.querySelector(".popup_type_edit");
+const Popupnewcard = document.querySelector(".popup_type_new-card");
+const editButtonopen = document.querySelector (".profile__edit-button");// находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
+const addButtonopen = document.querySelector (".profile__add-button");//находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
+const popupButtonclose= document.querySelector(".popup__close");// находим кнопку, которая закрывает попап, занчение присваиваем в переменную popupButtonclose 
+
+editButtonopen.addEventListener('click', (evt) => { 
+evt.preventDefault();
+Popupedit.classList.add('popup_is-opened');
+});
+addButtonopen.addEventListener('click', (evt) => { 
+  evt.preventDefault();
+  Popupnewcard.classList.add('popup_is-opened');
+  });
+
+popupButtonclose.addEventListener('click',(evt)=>{
+  evt.preventDefault();
+  Popup.classList.remove('popup_is-opened');
+});
+
+// реализация закрытия попапа через нажатие на оверлей. прослушиватель навесили на сам попап,
+// но непонятно почему работает.по моей логиге прослушиватель необходимо вешать на весь документ СПРОСИТь! 
+Popup.addEventListener('click',(evt)=>{ 
+  if(evt.target===evt.currentTarget){
+    Popup.classList.remove('popup_is-opened');
+  }
+});
+// реализация закрытия попапа через кнопку Esc
+document.addEventListener('keydown',(evt)=>{
+  if(evt.key ==='Escape'){
+   Popup.classList.remove('popup_is-opened');
+  }
+});
