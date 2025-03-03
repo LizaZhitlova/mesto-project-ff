@@ -73,37 +73,59 @@ initialCards.forEach(function (item) {
 // реализовываем всплывающие окна 
 // const editprofileForm=document.forms.edit-profile; // находим форму edit-profile значение присваиваем переменной editprofileForm
 // const newplaceForm=document.forms.new-place; // находим форму new-place и значение присваиваем  переменной newplaceForm
-const Popup = document.querySelector(".popup");
+const Popup = document.querySelectorAll(".popup");
 const Popupedit = document.querySelector(".popup_type_edit");
 const Popupnewcard = document.querySelector(".popup_type_new-card");
 const editButtonopen = document.querySelector (".profile__edit-button");// находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
 const addButtonopen = document.querySelector (".profile__add-button");//находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
-const popupButtonclose= document.querySelector(".popup__close");// находим кнопку, которая закрывает попап, занчение присваиваем в переменную popupButtonclose 
+const ImagePopup = document.querySelector (".popup_type_image");
+const popupButtonclose= document.querySelectorAll(".popup__close");// получаем коллекуию кнопок, которые закрывают попапы (крестик), коллекцию присваиваем переменной popupButtonclose 
+const CardsImg = document.querySelectorAll(".card__image");
 
+// методом  forEach перебираем коллекцию кнопок, лежащую в popupButtonclose для кажой добавлеям прослушиватель событий, в колбэк прослушивателя записываемфункцию PopupClose
+popupButtonclose.forEach(function(closeitem){
+  closeitem.addEventListener('click',PopupClose)
+});
+
+let CurrentOpenedPopup = null;// создаём переменную CurrentOpenedPopup, данная переменная будет хранить текущий открытй попап.
+
+// функция закрытия попапа, которая записывается в колбэк прослушивателя событий- с текущего открытого попапа снимаем класс .popup_is-opened
+function PopupClose (){
+  CurrentOpenedPopup.classList.remove('popup_is-opened');
+};
+
+// функция открытия попапа 
+
+function OpenPopup (selectoritem){
+ selectoritem.classList.add('popup_is-opened');
+ CurrentOpenedPopup =selectoritem;
+};
+
+// вешаем обработчик событий на кнопку редактировать профиль и в колбеке вызываем функцию OpenPopup
 editButtonopen.addEventListener('click', (evt) => { 
 evt.preventDefault();
-Popupedit.classList.add('popup_is-opened');
+OpenPopup(Popupedit);
 });
+
+// вешаем обработчик событий на кнопку редактировать профиль и в колбеке вызываем функцию OpenPopup
 addButtonopen.addEventListener('click', (evt) => { 
   evt.preventDefault();
-  Popupnewcard.classList.add('popup_is-opened');
+  OpenPopup(Popupnewcard);
   });
 
-popupButtonclose.addEventListener('click',(evt)=>{
-  evt.preventDefault();
-  Popup.classList.remove('popup_is-opened');
-});
+ 
 
-// реализация закрытия попапа через нажатие на оверлей. прослушиватель навесили на сам попап,
-// но непонятно почему работает.по моей логиге прослушиватель необходимо вешать на весь документ СПРОСИТь! 
-Popup.addEventListener('click',(evt)=>{ 
-  if(evt.target===evt.currentTarget){
-    Popup.classList.remove('popup_is-opened');
-  }
-});
-// реализация закрытия попапа через кнопку Esc
-document.addEventListener('keydown',(evt)=>{
-  if(evt.key ==='Escape'){
-   Popup.classList.remove('popup_is-opened');
-  }
-});
+// // реализация закрытия попапа через нажатие на оверлей. прослушиватель навесили на сам попап,
+// // но непонятно почему работает.по моей логиге прослушиватель необходимо вешать на весь документ СПРОСИТь! 
+//  Popup.addEventListener('click',(evt)=>{ 
+//  if(evt.target===evt.currentTarget){
+//    Popup.classList.remove('popup_is-opened');
+//      }
+// });
+// // реализация закрытия попапа через кнопку Esc
+// document.addEventListener('keydown',(evt)=>{
+//   if(evt.key ==='Escape'){
+//    Popup.classList.remove('popup_is-opened');
+//   }
+// });
+
