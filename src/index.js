@@ -1,6 +1,5 @@
-
- import "./index.css";// импорт главного файла стилей 
- import {initialCards} from './cards.js';
+import "./index.css"; // импорт главного файла стилей
+import { initialCards } from "./cards.js";
 
 // @todo: Темплейт карточки
 
@@ -70,62 +69,92 @@ initialCards.forEach(function (item) {
   cardList.append(appendCard);
 });
 
-// реализовываем всплывающие окна 
-// const editprofileForm=document.forms.edit-profile; // находим форму edit-profile значение присваиваем переменной editprofileForm
-// const newplaceForm=document.forms.new-place; // находим форму new-place и значение присваиваем  переменной newplaceForm
-const Popup = document.querySelectorAll(".popup");
-const Popupedit = document.querySelector(".popup_type_edit");
-const Popupnewcard = document.querySelector(".popup_type_new-card");
-const editButtonopen = document.querySelector (".profile__edit-button");// находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
-const addButtonopen = document.querySelector (".profile__add-button");//находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
-const ImagePopup = document.querySelector (".popup_type_image");
-const popupButtonclose= document.querySelectorAll(".popup__close");// получаем коллекуию кнопок, которые закрывают попапы (крестик), коллекцию присваиваем переменной popupButtonclose 
-const CardsImg = document.querySelectorAll(".card__image");
+// реализовываем всплывающие окна
+
+const Popupedit = document.querySelector(".popup_type_edit"); // находим блок в котором лежит код попапа "Редактировать профиль" и присваиваем значение в переменную Popupedit
+const Popupnewcard = document.querySelector(".popup_type_new-card"); // находим блок в котором лежит код папапа "Новое место" и присваиваем в переменную Popupnewcard
+const editButtonopen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
+const addButtonopen = document.querySelector(".profile__add-button"); //находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
+const ImagePopup = document.querySelector(".popup_type_image"); // находим блок в котором лежит код попапа для картинкии значение присваиваем в переменную ImagePopup
+const popupButtonclose = document.querySelectorAll(".popup__close"); // получаем коллекуию кнопок, которые закрывают попапы (крестик), коллекцию присваиваем переменной popupButtonclose
+let CurrentOpenedPopup = null; // создаём переменную CurrentOpenedPopup, данная переменная будет хранить текущий открытй попап.
+
 
 // методом  forEach перебираем коллекцию кнопок, лежащую в popupButtonclose для кажой добавлеям прослушиватель событий, в колбэк прослушивателя записываемфункцию PopupClose
-popupButtonclose.forEach(function(closeitem){
-  closeitem.addEventListener('click',PopupClose)
+popupButtonclose.forEach(function (closeitem) {
+  closeitem.addEventListener("click", PopupClose);
 });
 
-let CurrentOpenedPopup = null;// создаём переменную CurrentOpenedPopup, данная переменная будет хранить текущий открытй попап.
 
 // функция закрытия попапа, которая записывается в колбэк прослушивателя событий- с текущего открытого попапа снимаем класс .popup_is-opened
-function PopupClose (){
-  CurrentOpenedPopup.classList.remove('popup_is-opened');
-};
-
-// функция открытия попапа 
-
-function OpenPopup (selectoritem){
- selectoritem.classList.add('popup_is-opened');
- CurrentOpenedPopup =selectoritem;
-};
+function PopupClose() {
+  CurrentOpenedPopup.classList.remove("popup_is-opened");
+  CurrentOpenedPopup.removeEventListener("click", closePopupbyOverlay);
+  CurrentOpenedPopup = null;
+}
 
 // вешаем обработчик событий на кнопку редактировать профиль и в колбеке вызываем функцию OpenPopup
-editButtonopen.addEventListener('click', (evt) => { 
-evt.preventDefault();
-OpenPopup(Popupedit);
+editButtonopen.addEventListener("click", (evt) => {
+  evt.preventDefault();
+  OpenPopup(Popupedit);
 });
 
 // вешаем обработчик событий на кнопку редактировать профиль и в колбеке вызываем функцию OpenPopup
-addButtonopen.addEventListener('click', (evt) => { 
+addButtonopen.addEventListener("click", (evt) => {
   evt.preventDefault();
   OpenPopup(Popupnewcard);
-  });
+});
 
- 
+// функция открытия попапа
 
-// // реализация закрытия попапа через нажатие на оверлей. прослушиватель навесили на сам попап,
-// // но непонятно почему работает.по моей логиге прослушиватель необходимо вешать на весь документ СПРОСИТь! 
-//  Popup.addEventListener('click',(evt)=>{ 
-//  if(evt.target===evt.currentTarget){
-//    Popup.classList.remove('popup_is-opened');
-//      }
-// });
-// // реализация закрытия попапа через кнопку Esc
-// document.addEventListener('keydown',(evt)=>{
-//   if(evt.key ==='Escape'){
-//    Popup.classList.remove('popup_is-opened');
-//   }
-// });
+function OpenPopup(selectoritem) {
+  selectoritem.classList.add("popup_is-opened");
+  CurrentOpenedPopup = selectoritem;
+  CurrentOpenedPopup.addEventListener("click", closePopupbyOverlay); // при открытии попапа вешаем на текущий открытый попап прослушиватель событий, в колбэк
+  // прослушивателя передаём функцию, которая закрывает попапа по нажанию на оверлей.
+  //СПОСИТЬ Почему при нажатии на сам попапа оне не закрывается?
+}
 
+// реализация закрытия попапа через кнопку Esc
+document.addEventListener("keydown", (evt) => {
+  if (evt.key === "Escape") {
+    CurrentOpenedPopup.classList.remove("popup_is-opened");
+    CurrentOpenedPopup.removeEventListener("click", closePopupbyOverlay);
+  }
+});
+
+// функция closePopupbyOverlay передаётся в прослуживатель событий, который навешиается на текущий открытый попап (CurrentOpenedPopup)
+function closePopupbyOverlay(evt) {
+  if (evt.currentTarget === evt.target) {
+    CurrentOpenedPopup.classList.remove("popup_is-opened");
+    CurrentOpenedPopup.removeEventListener("click", closePopupbyOverlay);
+  }
+};
+
+// реализовывем открытие поапа по нажатию на картинку
+
+// вещаем прослушиватель событый на список с карточками (здесь работает высплытие, список карточек является родительким для элементов списка, в котором хранятся карточки)
+// в колбэк прослушивателя записываем функцию OpenCardIM.
+cardList.addEventListener("click", OpenCardIMG);
+
+// в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
+// в переменную currentimg присваиваем значение элемента, на котором произошло событие
+// впеременных imglink и imgname получаем значения src и alt переменной currentim
+// ищем в документе элемент кртинки и присываиваем значение в переменную IMG
+// свойствам src и alt переменной IMG (т.е. нашей картинке ) присваиваем знаяения полученные в переменных imglink и imgname
+//ищем в документе элемент параграфа(т.е. названия картинки) и присываиваем значение в переменную IMGCaption
+// свойству .textContent переменной IMGCaption присваиваем значение полученное в imglink
+function OpenCardIMG(evt) {
+  if (!evt.target.classList.contains("card__image")) {
+    return;
+  }
+  let currentimg = evt.target;
+  let imglink = currentimg.src;
+  let imgname = currentimg.alt;
+  const IMG = document.querySelector(".popup__image");
+  IMG.src = imglink;
+  IMG.alt = imgname;
+  const IMGCaption = document.querySelector(".popup__caption");
+  IMGCaption.textContent = imgname;
+  OpenPopup(ImagePopup);
+}
