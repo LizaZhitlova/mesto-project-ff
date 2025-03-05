@@ -46,7 +46,7 @@ function initCard(arrayEl, arrayIt, delFunction) {
   // возвращаем перменную содержащую шаблон элемента списка
 
   return cardElement;
-}
+};
 
 // @todo: Функция удаления карточки
 
@@ -54,7 +54,7 @@ function deleteCard(event) {
   const eventElement = event.target;
   const listItem = eventElement.closest(".places__item");
   listItem.remove();
-}
+};
 
 // @todo: Вывести карточки на страницу
 
@@ -79,55 +79,60 @@ const ImagePopup = document.querySelector(".popup_type_image"); // находи�
 const popupButtonclose = document.querySelectorAll(".popup__close"); // получаем коллекуию кнопок, которые закрывают попапы (крестик), коллекцию присваиваем переменной popupButtonclose
 let CurrentOpenedPopup = null; // создаём переменную CurrentOpenedPopup, данная переменная будет хранить текущий открытй попап.
 
-
 // методом  forEach перебираем коллекцию кнопок, лежащую в popupButtonclose для кажой добавлеям прослушиватель событий, в колбэк прослушивателя записываемфункцию PopupClose
-popupButtonclose.forEach(function (closeitem) {
-  closeitem.addEventListener("click", PopupClose);
+popupButtonclose.forEach(function (popupElement) {
+  popupElement.addEventListener("click", PopupClose);
 });
-
 
 // функция закрытия попапа, которая записывается в колбэк прослушивателя событий- с текущего открытого попапа снимаем класс .popup_is-opened
 function PopupClose() {
   CurrentOpenedPopup.classList.remove("popup_is-opened");
   CurrentOpenedPopup.removeEventListener("click", closePopupbyOverlay);
   CurrentOpenedPopup = null;
-}
+};
 
 // вешаем обработчик событий на кнопку редактировать профиль и в колбеке вызываем функцию OpenPopup
 editButtonopen.addEventListener("click", (evt) => {
   evt.preventDefault();
+  // при открытии формы поля «Имя» и «О себе» должны быть заполнены теми значениями, которые отображаются на странице.
+  const profileTitle = document.querySelector(".profile__title"); // находим эелемнт в котором хранится имя
+  const profileDescription = document.querySelector(".profile__description"); //находим эелемнт в котором хранится О себе
+  const nameInput = document.querySelector(".popup__input_type_name"); // находим импут для имени
+  const jobInput = document.querySelector(".popup__input_type_description"); // находим импут для формы
+  // приравниваем значениям импутов имени и о себе текстовым значения со страницы
+  nameInput.value = profileTitle.textContent;
+  jobInput.value = profileDescription.textContent;
   OpenPopup(Popupedit);
 });
 
 // вешаем обработчик событий на кнопку редактировать профиль и в колбеке вызываем функцию OpenPopup
 addButtonopen.addEventListener("click", (evt) => {
   evt.preventDefault();
+
   OpenPopup(Popupnewcard);
 });
 
 // функция открытия попапа
 
-function OpenPopup(selectoritem) {
-  selectoritem.classList.add("popup_is-opened");
-  CurrentOpenedPopup = selectoritem;
+function OpenPopup(popupElement) {
+  popupElement.classList.add("popup_is-opened");
+  CurrentOpenedPopup = popupElement;
   CurrentOpenedPopup.addEventListener("click", closePopupbyOverlay); // при открытии попапа вешаем на текущий открытый попап прослушиватель событий, в колбэк
   // прослушивателя передаём функцию, которая закрывает попапа по нажанию на оверлей.
   //СПОСИТЬ Почему при нажатии на сам попапа оне не закрывается?
-}
+};
 
 // реализация закрытия попапа через кнопку Esc
 document.addEventListener("keydown", (evt) => {
   if (evt.key === "Escape") {
-    CurrentOpenedPopup.classList.remove("popup_is-opened");
-    CurrentOpenedPopup.removeEventListener("click", closePopupbyOverlay);
+    PopupClose();
   }
 });
 
 // функция closePopupbyOverlay передаётся в прослуживатель событий, который навешиается на текущий открытый попап (CurrentOpenedPopup)
 function closePopupbyOverlay(evt) {
   if (evt.currentTarget === evt.target) {
-    CurrentOpenedPopup.classList.remove("popup_is-opened");
-    CurrentOpenedPopup.removeEventListener("click", closePopupbyOverlay);
+    PopupClose();
   }
 };
 
@@ -157,4 +162,33 @@ function OpenCardIMG(evt) {
   const IMGCaption = document.querySelector(".popup__caption");
   IMGCaption.textContent = imgname;
   OpenPopup(ImagePopup);
-}
+};
+
+// реализовываем редактирование информации "о себе " в попапе
+
+// Находим форму в DOM
+const formElement = document.querySelector('[name ="edit-profile"]'); // Воспользуйтесь методом querySelector()
+// Находим поля формы в DOM
+const newNameInput = document.querySelector(".popup__input_type_name"); // Воспользуйтесь инструментом .querySelector()
+const newJobInput = document.querySelector(".popup__input_type_description"); // Воспользуйтесь инструментом .querySelector()
+
+// Обработчик «отправки» формы, хотя пока
+// она никуда отправляться не будет
+function handleFormSubmit(evt) {
+  evt.preventDefault(); // Эта строчка отменяет стандартную отправку формы.
+
+  // Получите значение полей newNameInput  и newJobInput из свойства value
+  const newNameValue = newNameInput.value;
+  const newJobValue = newJobInput.value;
+  // Выберите элементы, куда должны быть вставлены значения полей. выбирвем элементы зголовка и параграфа на странице
+  const newprofileTitle = document.querySelector(".profile__title");
+  const newprofileDescription = document.querySelector(".profile__description");
+  // Вставьте новые значения с помощью textContent
+  newprofileTitle.textContent = newNameValue;
+  newprofileDescription.textContent = newJobValue;
+  CurrentOpenedPopup = null; // обнуляем переменную CurrentOpenedPopup, чтобы после закрытия формы в ней ничего не хранилось
+};
+
+// Прикрепляем обработчик к форме:
+// он будет следить за событием “submit” - «отправка»
+formElement.addEventListener("submit", handleFormSubmit);
