@@ -22,7 +22,7 @@ const cardList = document.querySelector(".places__list");
 // возвращаемое значение:
 //  шаблон элемента списка
 
-function initCard(arrayEl, arrayIt, delFunction) {
+function initCard(arrayEl, arrayIt, delFunction,openFunction,likeFunction) {
   // ищем элемент с классом .places__item, клонируем элемент вместе с его содержимым,
   // присваимаем склонированный элемент вмсете с его содержимым в переменную cardElement
 
@@ -45,6 +45,15 @@ function initCard(arrayEl, arrayIt, delFunction) {
 
   // возвращаем перменную содержащую шаблон элемента списка
 
+  cardElement
+  .querySelector(".card__image")
+  .addEventListener("click", openFunction);
+  
+  cardElement
+    .querySelector(".card__like-button")
+    .addEventListener("click", likeFunction);
+
+
   return cardElement;
 };
 
@@ -65,7 +74,7 @@ initialCards.forEach(function (item) {
   // функция переданная в метод forEach вызывает функцию initCard, которой переданы агрумены:
   //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
 
-  let appendCard = initCard(item.name, item.link, deleteCard);
+  let appendCard = initCard(item.name, item.link, deleteCard,OpenCardIMG,likeCard);
   cardList.append(appendCard);
 });
 
@@ -78,7 +87,9 @@ const addButtonopen = document.querySelector(".profile__add-button"); //нахо
 const ImagePopup = document.querySelector(".popup_type_image"); // находим блок в котором лежит код попапа для картинкии значение присваиваем в переменную ImagePopup
 const popupButtonclose = document.querySelectorAll(".popup__close"); // получаем коллекуию кнопок, которые закрывают попапы (крестик), коллекцию присваиваем переменной popupButtonclose
 let CurrentOpenedPopup = null; // создаём переменную CurrentOpenedPopup, данная переменная будет хранить текущий открытй попап.
-
+Popupedit.classList.add("popup_is-animated");
+Popupnewcard.classList.add("popup_is-animated");
+ImagePopup.classList.add("popup_is-animated");
 // методом  forEach перебираем коллекцию кнопок, лежащую в popupButtonclose для кажой добавлеям прослушиватель событий, в колбэк прослушивателя записываемфункцию PopupClose
 popupButtonclose.forEach(function (popupElement) {
   popupElement.addEventListener("click", PopupClose);
@@ -86,7 +97,7 @@ popupButtonclose.forEach(function (popupElement) {
 
 // функция закрытия попапа, которая записывается в колбэк прослушивателя событий- с текущего открытого попапа снимаем класс .popup_is-opened
 function PopupClose() {
-  CurrentOpenedPopup.classList.remove("popup_is-opened");
+  CurrentOpenedPopup.classList.remove("popup_is-opened",);
   CurrentOpenedPopup.removeEventListener("click", closePopupbyOverlay);
   CurrentOpenedPopup = null;
 };
@@ -115,6 +126,7 @@ addButtonopen.addEventListener("click", (evt) => {
 // функция открытия попапа
 
 function OpenPopup(popupElement) {
+  // popupElement.classList.add("popup_is-animated");
   popupElement.classList.add("popup_is-opened");
   CurrentOpenedPopup = popupElement;
   CurrentOpenedPopup.addEventListener("click", closePopupbyOverlay); // при открытии попапа вешаем на текущий открытый попап прослушиватель событий, в колбэк
@@ -140,7 +152,7 @@ function closePopupbyOverlay(evt) {
 
 // вещаем прослушиватель событый на список с карточками (здесь работает высплытие, список карточек является родительким для элементов списка, в котором хранятся карточки)
 // в колбэк прослушивателя записываем функцию OpenCardIM.
-cardList.addEventListener("click", OpenCardIMG);
+// cardList.addEventListener("click", OpenCardIMG);
 
 // в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
 // в переменную currentimg присваиваем значение элемента, на котором произошло событие
@@ -186,9 +198,43 @@ function handleFormSubmit(evt) {
   // Вставьте новые значения с помощью textContent
   newprofileTitle.textContent = newNameValue;
   newprofileDescription.textContent = newJobValue;
+  PopupClose();
   CurrentOpenedPopup = null; // обнуляем переменную CurrentOpenedPopup, чтобы после закрытия формы в ней ничего не хранилось
 };
 
 // Прикрепляем обработчик к форме:
 // он будет следить за событием “submit” - «отправка»
 formElement.addEventListener("submit", handleFormSubmit);
+
+
+// функция лайка 
+
+ function likeCard (evt) {
+  if (!evt.target.classList.contains('card__like-button')) {
+ return;
+};
+evt.target.classList.toggle('card__like-button_is-active');
+console.log(evt.target);
+};
+
+// добавление карточки 
+ 
+// находим форму в ДОМ 
+const formNewPlace = document.querySelector('[name ="new-place"]');
+// Находим поля формы в DOM
+const newPlaceName = document.querySelector (".popup__input_type_card-name");
+const newPlaceSrc = document.querySelector (".popup__input_type_url");
+
+formNewPlace.addEventListener("submit", newCardSubmit);
+
+
+function newCardSubmit (evt) {
+evt.preventDefault();
+const newPlaceNameValue = newPlaceName.value;
+const newPlaceSrcValue = newPlaceSrc.value;
+
+let appendCard = initCard(newPlaceNameValue,newPlaceSrcValue,deleteCard,OpenCardIMG,likeCard);
+cardList.prepend(appendCard);
+PopupClose();
+formNewPlace.reset();
+};
