@@ -2,9 +2,6 @@
 // в файл card.js помещаем функции отвещающие за создание карточек 
  import {PopupClose} from "./modal.js";
  import {OpenPopup} from "./modal.js";
-//в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
-// content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
-let cardTemplate = document.querySelector("#card-template").content;
 
 //initCard - это функция предназначенная для создания карточки
 // переменные
@@ -15,6 +12,10 @@ let cardTemplate = document.querySelector("#card-template").content;
 //  шаблон элемента списка
 
 export function initCard(arrayEl, arrayIt) {
+
+//в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
+// content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
+let cardTemplate = document.querySelector("#card-template").content;
     // ищем элемент с классом .places__item, клонируем элемент вместе с его содержимым,
     // присваимаем склонированный элемент вмсете с его содержимым в переменную cardElement
   
@@ -44,8 +45,7 @@ export function initCard(arrayEl, arrayIt) {
     cardElement
       .querySelector(".card__like-button")
       .addEventListener("click", likeCard);
-  
-  
+      
     return cardElement;
   };
 
@@ -71,19 +71,21 @@ function likeCard (evt) {
 
 export function newCardSubmit (evt) {
     evt.preventDefault();
+    //находим поля формы в ДОМ
     let newPlaceName = document.querySelector (".popup__input_type_card-name");
     let newPlaceSrc = document.querySelector (".popup__input_type_url");
+    //присваиваем им значения полей формы
     let newPlaceNameValue = newPlaceName.value;
     let newPlaceSrcValue = newPlaceSrc.value;
-    let cardList = document.querySelector(".places__list");
-    const formNewPlace = document.querySelector('[name ="new-place"]');
+    let cardList = document.querySelector(".places__list");//находим список где хранятся темплейты карточек
+    const formNewPlace = document.querySelector('[name ="new-place"]');// находим форму, для применеия на мей метода сброса 
     let appendCard = initCard(newPlaceNameValue,newPlaceSrcValue);
     cardList.prepend(appendCard);
     PopupClose();
     formNewPlace.reset();
     };
 
-    // в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
+// в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
 // в переменную currentimg присваиваем значение элемента, на котором произошло событие
 // впеременных imglink и imgname получаем значения src и alt переменной currentim
 // ищем в документе элемент кртинки и присываиваем значение в переменную IMG
