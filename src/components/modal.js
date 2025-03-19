@@ -7,7 +7,7 @@ export function openPopup(popupElement) {
   // popupElement.classList.add("popup_is-animated");
   popupElement.classList.add("popup_is-opened");
   currentOpenedPopup = popupElement;
-  currentOpenedPopup.addEventListener("click", closePopupbyOverlay); // при открытии попапа вешаем на текущий открытый попап прослушиватель событий, в колбэк
+  currentOpenedPopup.addEventListener("click", closePopupByOverlay); // при открытии попапа вешаем на текущий открытый попап прослушиватель событий, в колбэк
   // прослушивателя передаём функцию, которая закрывает попапа по нажанию на оверлей.
   //СПОСИТЬ Почему при нажатии на сам попапа оне не закрывается?
   document.addEventListener("keydown", closeByEsc);
@@ -16,13 +16,13 @@ export function openPopup(popupElement) {
 // функция закрытия попапа, которая записывается в колбэк прослушивателя событий- с текущего открытого попапа снимаем класс .popup_is-opened
 export function popupClose() {
   currentOpenedPopup.classList.remove("popup_is-opened");
-  currentOpenedPopup.removeEventListener("click", closePopupbyOverlay);
+  currentOpenedPopup.removeEventListener("click", closePopupByOverlay);
   document.removeEventListener("keydown", closeByEsc);
   currentOpenedPopup = null;
 }
 
 // функция closePopupbyOverlay передаётся в прослуiиватель событий, который навешивается на текущий открытый попап (currentOpenedPopup)
-function closePopupbyOverlay(evt) {
+function closePopupByOverlay(evt) {
   if (evt.currentTarget === evt.target) {
     popupClose();
   }

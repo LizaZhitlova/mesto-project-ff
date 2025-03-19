@@ -15,7 +15,7 @@ export function makeCard(
 ) {
   //в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
   // content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
-  let cardTemplate = document.querySelector("#card-template").content;
+  const cardTemplate = document.querySelector("#card-template").content;
   // ищем элемент с классом .places__item, клонируем элемент вместе с его содержимым,
   // присваимаем склонированный элемент вмсете с его содержимым в переменную cardElement
 

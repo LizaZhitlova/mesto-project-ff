@@ -36,8 +36,8 @@ editButtonOpen.addEventListener("click", editProfile);
 // вешаем обработчик событий на кнопку "+" и в колбеке вызываем функцию OpenPopup
 addButtOnopen.addEventListener("click", (evt) => {
   evt.preventDefault();
-  const PopupNewCard = document.querySelector(".popup_type_new-card"); // находим блок в котором лежит код папапа "Новое место" и присваиваем в переменную Popupnewcard
-  openPopup(PopupNewCard);
+  const popupNewCard = document.querySelector(".popup_type_new-card"); // находим блок в котором лежит код папапа "Новое место" и присваиваем в переменную Popupnewcard
+  openPopup(popupNewCard);
 });
 
 // методом  forEach перебираем коллекцию кнопок, лежащую в popupButtonClose для кажой добавлеям прослушиватель событий, в колбэк прослушивателя записываемфункцию PopupClose
@@ -106,7 +106,7 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
     const newPlaceSrcValue = newPlaceSrc.value;
     const cardList = document.querySelector(".places__list");//находим список где хранятся темплейты карточек
     const formNewPlace = document.querySelector('[name ="new-place"]');// находим форму, для применеия на мей метода сброса 
-    let newCard = makeCard(newPlaceNameValue,newPlaceSrcValue,deleteCard,openCardIMG,likeCard);
+    const newCard = makeCard(newPlaceNameValue,newPlaceSrcValue,deleteCard,openCardIMG,likeCard);
     cardList.prepend(newCard);
     popupClose();
     formNewPlace.reset();
