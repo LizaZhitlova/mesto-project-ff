@@ -2,14 +2,16 @@ import "./index.css"; // импорт главного файла стилей
 import {initialCards} from "./components/cards.js"; // импорт массива со ссылками на картинки
 import {makeCard,deleteCard,likeCard} from "./components/card.js"; // импорт функций
 import {openPopup,popupClose} from "./components/modal.js"; //импорт функций
+import {enableValidation} from "./components/validation.js"; 
+
 
 const editButtonOpen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
 const addButtOnopen = document.querySelector(".profile__add-button"); //находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
 const popupButtonClose = document.querySelectorAll(".popup__close"); // получаем коллекуию кнопок, которые закрывают попапы (крестик), коллекцию присваиваем переменной popupButtonClose
 const popup = document.querySelectorAll(".popup");
 //находим формы в DOM
-const formEditProfile = document.querySelector('[name ="edit-profile"]');
-const formNewPlace = document.querySelector('[name ="new-place"]');
+  const formEditProfile = document.querySelector('[name ="edit-profile"]');
+  const formNewPlace = document.querySelector('[name ="new-place"]');
 
 // Вывовд карточек  на страницу при загрузке
 
@@ -134,3 +136,5 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
     const imagePopup = document.querySelector(".popup_type_image");
     openPopup(imagePopup);
   };
+
+  enableValidation(); 

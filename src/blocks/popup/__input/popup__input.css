@@ -20,3 +20,16 @@
     line-height: 15px;
   }
 }
+
+  .type_error {
+    border-bottom: 1px solid rgba(255, 0, 0, 1);
+}
+
+.popup_input-error{
+  visibility: hidden;
+}
+
+.popup_input-error_active{
+  visibility: visible;
+  color:rgba(255, 0, 0, 1);
+}
