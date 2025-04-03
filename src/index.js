@@ -2,7 +2,7 @@ import "./index.css"; // импорт главного файла стилей
 import {initialCards} from "./components/cards.js"; // импорт массива со ссылками на картинки
 import {makeCard,deleteCard,likeCard} from "./components/card.js"; // импорт функций
 import {openPopup,popupClose} from "./components/modal.js"; //импорт функций
-import {enableValidation} from "./components/validation.js"; 
+import {enableValidation,config,clearValidation} from "./components/validation.js";
 
 
 const editButtonOpen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
@@ -93,10 +93,14 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
   const popupEdit = document.querySelector(".popup_type_edit");
+  const formEditProfile = document.querySelector('[name ="edit-profile"]');
+  clearValidation(formEditProfile, config);
   openPopup(popupEdit);
+
+
 };
 
-  // функция добавленя новой карточки на страницу 
+  // функция добавленя новой карточки на страницу
 
    function newCardSubmit (evt) {
     evt.preventDefault();
@@ -107,12 +111,13 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
     const newPlaceNameValue = newPlaceName.value;
     const newPlaceSrcValue = newPlaceSrc.value;
     const cardList = document.querySelector(".places__list");//находим список где хранятся темплейты карточек
-    const formNewPlace = document.querySelector('[name ="new-place"]');// находим форму, для применеия на мей метода сброса 
+    const formNewPlace = document.querySelector('[name ="new-place"]');// находим форму, для применеия на мей метода сброса
     const newCard = makeCard(newPlaceNameValue,newPlaceSrcValue,deleteCard,openCardIMG,likeCard);
     cardList.prepend(newCard);
     popupClose();
     formNewPlace.reset();
-    };  
+    clearValidation(formNewPlace,config);
+    };
 
 // в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
 // в переменную currentimg присваиваем значение элемента, на котором произошло событие
@@ -137,4 +142,5 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
     openPopup(imagePopup);
   };
 
-  enableValidation(); 
+  // вывызваем функцию валидации полей
+  enableValidation(config);
