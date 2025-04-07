@@ -3,8 +3,10 @@
 
 //объект настроек
 export const config = {
-inputErrorClass:"type_error",
-errorMassageClass:"popup_input-error_active",
+inputErrorClass:".type_error",
+inputErrorSelector:"type_error",
+errorMassageClass:".popup_input-error_active",
+errorMassageSelector:"popup_input-error_active",
 inputSelector:".popup__input",
 submitButtonSelector:".popup__button",
 formSelector:".popup__form",
@@ -15,33 +17,33 @@ submitButtonErrorClass:"popup__button_inactive"
 
 //Эта функция должна принимать как параметры DOM-элемент формы, для которой очищаются ошибки валидации и объект с настройками валидации. Используйте функцию clearValidation при заполнении формы профиля во время её открытия и при очистке формы добавления карточки.
 export function clearValidation(formElement,validationConfig){
-    const errorElements=formElement.querySelectorAll(config.errorMassageClass);
+    const errorElements=formElement.querySelectorAll(validationConfig.errorMassageClass);
     errorElements.forEach(function(errorElement){
-    errorElement.classList.remove(config.errorMassageClass);
+    errorElement.classList.remove(validationConfig.errorMassageSelector);
     errorElement.textContent = '';
     })
-const inputElements =formElement.querySelectorAll(config.inputErrorClass);
+const inputElements =formElement.querySelectorAll(validationConfig.inputErrorClass);
 inputElements.forEach(function(inputElement){
-    inputElement.classList.remove(config.inputErrorClass);
+    inputElement.classList.remove(validationConfig.inputErrorSelector);
 })
 
-const submitButton = formElement.querySelector(config.submitButtonSelector);
+const submitButton = formElement.querySelector(validationConfig.submitButtonSelector);
   submitButton.disabled = true;
-  submitButton.classList.add(config.submitButtonErrorClass);
+  submitButton.classList.add(validationConfig.submitButtonErrorClass);
 };
 
 // показывает элемент ошибки, подсвечивает поле с ошибкой
 function showInputError(formElement, inputElement, errorMessage){
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.add(config.inputErrorClass);
+    inputElement.classList.add(config.inputErrorSelector);
     errorElement.textContent=errorMessage;
-    errorElement.classList.add(config.errorMassageClass);
+    errorElement.classList.add(config.errorMassageSelector);
 }
 //скрывает элемент ошибки
 function hideInputError(formElement, inputElement){
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.remove(config.inputErrorClass);
-    errorElement.classList.remove(config.errorMassageClass);
+    inputElement.classList.remove(config.inputErrorSelector);
+    errorElement.classList.remove(config.errorMassageSelector);
     errorElement.textContent = '';
 };
 //проверяет валидность поля, внутри вызывает showInputError или hideInputError.
