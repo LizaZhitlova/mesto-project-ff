@@ -3,7 +3,7 @@ import {initialCards} from "./components/cards.js"; // импорт массив
 import {makeCard,deleteCard,likeCard} from "./components/card.js"; // импорт функций
 import {openPopup,popupClose} from "./components/modal.js"; //импорт функций
 import {enableValidation,config,clearValidation} from "./components/validation.js";
-
+import "./components/api.js";
 
 const editButtonOpen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
 const addButtOnopen = document.querySelector(".profile__add-button"); //находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
@@ -17,13 +17,26 @@ const popup = document.querySelectorAll(".popup");
 
 //forEach передаётся функция, которая вызывается на каждом элементе массива.
 //в качестве агрумента функции присваивается текущий элемент массива - item.
-initialCards.forEach(function (item) {
+// initialCards.forEach(function (item) {
+//   // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
+//   //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
+//   let appendCard = makeCard(item.name, item.link,deleteCard,openCardIMG,likeCard);
+//   const cardList = document.querySelector(".places__list"); // список, в котором хранятся каточки, т.е в него записываются темплейты
+//   cardList.append(appendCard);
+// });
+
+// функция вывода карточек с сервера 
+
+export function appendCarsAPI (usersCars){
+
+  usersCars.forEach(function (item) {
   // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
   //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
   let appendCard = makeCard(item.name, item.link,deleteCard,openCardIMG,likeCard);
   const cardList = document.querySelector(".places__list"); // список, в котором хранятся каточки, т.е в него записываются темплейты
   cardList.append(appendCard);
-});
+})};
+
 
 // добавление новой карточки
 
@@ -144,3 +157,5 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
 
   // вывызваем функцию валидации полей
   enableValidation(config);
+
+  
