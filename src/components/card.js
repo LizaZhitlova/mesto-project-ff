@@ -6,13 +6,17 @@
 // возвращаемое значение:
 //  шаблон элемента списка
 
+import {getMyId} from "./api.js";
+
 export function makeCard(
   name,
   link,
+  id,
   functionDeleteCard,
   functionOpenCardImg,
   functionLikeCard
 ) {
+  const myId= getMyId();
   //в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
   // content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
   const cardTemplate = document.querySelector("#card-template").content;
@@ -30,6 +34,12 @@ export function makeCard(
   imgElement.src = link;
   imgElement.alt = name;
 
+  if(!(myId===id)){
+    cardElement.querySelector(".card__delete-button").classList.add("card__delete-button-hidden");
+    }
+    else{
+      let r=5; 
+    }
   // ищем элемент с классом .card__delete-button, addEventListener - устанвливает метод с для найденного элемента при событии click
 
   cardElement
