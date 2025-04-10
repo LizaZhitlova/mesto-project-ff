@@ -66,11 +66,6 @@ Promise.all([
     console.log("Загруженные карточки:", cardData);
     myId = userIdData._id;
     appendCarsAPI(cardData);
-    cardData.forEach(function(cardData){
-    const likeCounter = document.querySelector(".card__likes-number");
-    likeCounter.textContent=cardData.likes.length;
-    })
-
   })
 
   .catch((error) => {
@@ -104,30 +99,30 @@ fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
     alert("Не удалось загрузить данные профиля");
   });
 
-  // Добавление новой карточки на страницу 
+//   // Добавление новой карточки на страницу 
 
-  fetch("https://nomoreparties.co/v1/wff-cohort-35/cards", {
-    method: "POST",
-    headers: {
-      authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: "Rail Intermodal",
-      link: "https://t-magistral.ru/assets/images/f6a8603a1b2e7c2159589425342e4ec8_l(1).jpg",
-    })
-})
+//   fetch("https://nomoreparties.co/v1/wff-cohort-35/cards", {
+//     method: "POST",
+//     headers: {
+//       authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({
+//       name: "Rail Intermodal",
+//       link: "https://t-magistral.ru/assets/images/f6a8603a1b2e7c2159589425342e4ec8_l(1).jpg",
+//     })
+// })
 
-.then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-  })
-  .then((data) => {
-    console.log("Данные новой карточки:",data);
+// .then((res) => {
+//     if (res.ok) {
+//       return res.json();
+//     }
+//   })
+//   .then((data) => {
+//     console.log("Данные новой карточки:",data);
     
-  })
-  .catch((error) => {
-    console.error("Ошибка при загрузке данных:", error);
-    alert("Не удалось загрузить данные карточки");
-  });
+//   })
+//   .catch((error) => {
+//     console.error("Ошибка при загрузке данных:", error);
+//     alert("Не удалось загрузить данные карточки");
+//   });

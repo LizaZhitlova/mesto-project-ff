@@ -1,6 +1,6 @@
 import "./index.css"; // импорт главного файла стилей
 import {initialCards} from "./components/cards.js"; // импорт массива со ссылками на картинки
-import {makeCard,deleteCard,likeCard} from "./components/card.js"; // импорт функций
+import {makeCard,deleteCard,likeCard,likeCounter,openConfirmPopup} from "./components/card.js"; // импорт функций
 import {openPopup,popupClose} from "./components/modal.js"; //импорт функций
 import {enableValidation,config,clearValidation} from "./components/validation.js";
 import "./components/api.js";
@@ -12,7 +12,7 @@ const popup = document.querySelectorAll(".popup");
 //находим формы в DOM
   const formEditProfile = document.querySelector('[name ="edit-profile"]');
   const formNewPlace = document.querySelector('[name ="new-place"]');
- 
+;
 
 // Вывовд карточек  на страницу при загрузке
 
@@ -33,7 +33,7 @@ export function appendCarsAPI (usersCars){
   usersCars.forEach(function (item) {
   // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
   //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
-  let appendCard = makeCard(item.name, item.link,item._id,deleteCard,openCardIMG,likeCard);
+  let appendCard = makeCard(item.name, item.link,item.likes,item.owner._id,item._id,openConfirmPopup,openCardIMG,likeCard,likeCounter);
   const cardList = document.querySelector(".places__list"); // список, в котором хранятся каточки, т.е в него записываются темплейты
   cardList.append(appendCard);
 })};
@@ -127,7 +127,7 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
     const cardList = document.querySelector(".places__list");//находим список где хранятся темплейты карточек
     const formNewPlace = document.querySelector('[name ="new-place"]');// находим форму, для применеия на мей метода сброса
     const myId=getMyId();
-    const newCard = makeCard(newPlaceNameValue,newPlaceSrcValue,myId,deleteCard,openCardIMG,likeCard);
+    const newCard = makeCard(newPlaceNameValue,newPlaceSrcValue,cardLikes,ownerId,cardId,openConfirmPopup,openCardIMG,likeCard);
     cardList.prepend(newCard);
     popupClose();
     formNewPlace.reset();

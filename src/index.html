@@ -69,10 +69,17 @@
       <p class="popup__caption"></p>
     </div>
   </div>
+  <div class="popup popup_type_confirm">
+    <div class="popup__content">
+      <button type="button" class="popup__close"></button>
+      <h3 class="popup__title">Вы уверены?</h3>
+      <button type="submit" class="button popup__button popup__button-confirm">Да</button>
+    </div>
+  </div>
 </div>
 <template id="card-template">
   <li class="places__item card">
-    <img class="card__image" src="" alt="" />
+    <img class="card__image" src="" alt="" id=""/>
     <button type="button" class="card__delete-button"></button>
     <div class="card__description">
       <h2 class="card__title">
