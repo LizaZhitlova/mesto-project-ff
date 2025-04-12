@@ -33,7 +33,7 @@ export function appendCarsAPI (usersCars){
   usersCars.forEach(function (item) {
   // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
   //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
-  let appendCard = makeCard(item.name, item.link,item.likes,item.owner._id,item._id,openConfirmPopup,openCardIMG,likeCard,likeCounter);
+  let appendCard = makeCard(item.name, item.link,item.likes,item.owner._id,item._id,openConfirmPopup,openCardIMG,likeCard);
   const cardList = document.querySelector(".places__list"); // список, в котором хранятся каточки, т.е в него записываются темплейты
   cardList.append(appendCard);
 })};
@@ -119,20 +119,46 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
    function newCardSubmit (evt) {
     evt.preventDefault();
     //находим поля формы в ДОМ
-    const newPlaceName = document.querySelector (".popup__input_type_card-name");
-    const newPlaceSrc = document.querySelector (".popup__input_type_url");
+    const cardForm = evt.target;
+    const newPlaceName = cardForm.querySelector (".popup__input_type_card-name");
+    const newPlaceSrc = cardForm.querySelector (".popup__input_type_url");
     //присваиваем им значения полей формы
     const newPlaceNameValue = newPlaceName.value;
     const newPlaceSrcValue = newPlaceSrc.value;
-    const cardList = document.querySelector(".places__list");//находим список где хранятся темплейты карточек
-    const formNewPlace = document.querySelector('[name ="new-place"]');// находим форму, для применеия на мей метода сброса
-    const myId=getMyId();
-    const newCard = makeCard(newPlaceNameValue,newPlaceSrcValue,cardLikes,ownerId,cardId,openConfirmPopup,openCardIMG,likeCard);
-    cardList.prepend(newCard);
-    popupClose();
-    formNewPlace.reset();
-    clearValidation(formNewPlace,config);
-    };
+
+    fetch('https://nomoreparties.co/v1/wff-cohort-35/cards', {
+      method: 'POST',
+      headers: {
+        authorization: 'cc15c7c0-115a-417c-9697-eca1b1849815',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: newPlaceNameValue ,
+        link: newPlaceSrcValue, // URL, который ввел пользователь
+      })
+    })
+    .then(res => {
+      return res.json();
+    })
+    .then(cardData => {
+      // Создаем и добавляем карточку на страницу
+      const cardList = document.querySelector('.places__list');//находим список где хранятся темплейты карточек
+      // const myId = getMyId();
+      const newCard = makeCard(cardData.name,cardData.link,cardData.likes,cardData.owner._id,cardData._id,openConfirmPopup,openCardIMG);
+      cardList.prepend(newCard);
+      // Закрываем попап и сбрасываем форму
+      const popupNewPlace= document.querySelector(".popup_type_new-card")
+      popupClose(popupNewPlace);
+      const formNewPlace = document.querySelector('[name ="new-place"]');
+      formNewPlace.reset();
+      clearValidation(formNewPlace, config);
+    })
+    .catch(error => {
+      console.error('Ошибка при создании карточки:', error);
+      alert('Не удалось создать карточку. Проверьте URL изображения и попробуйте снова.');
+    });
+  };
+
 
 // в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
 // в переменную currentimg присваиваем значение элемента, на котором произошло событие

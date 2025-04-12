@@ -12,13 +12,11 @@ import {openPopup,popupClose} from "./modal.js";
 export function makeCard(
   name,
   link,
-  likes,
+  like,
   ownerId,
   cardId,
   functionConfirmPopup,
-  functionOpenCardImg,
-  functionLikeCard,
-) {
+  functionOpenCardImg) {
   const myId= getMyId();
   //в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
   // content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
@@ -37,7 +35,7 @@ export function makeCard(
   imgElement.src = link;
   imgElement.alt = name;
   imgElement.id = cardId;
- 
+  imgElement.likes=like;
 
   // делаем проверку если мой ID не совпадает ID владельца карточки - удаляем кнопку удаленя с карточки 
   if(!(myId===ownerId)){
@@ -47,9 +45,12 @@ export function makeCard(
     // работа с лайками 
     const likesCounter = cardElement.querySelector(".card__likes-number");
     // Устанавливаем начальное количество лайков
-    likesCounter.textContent = likes.length;
-   
+    likesCounter.textContent = like.length;
 
+    if (like.length !== 0){
+      let a =5;
+    }
+   
   // ищем элемент с классом .card__delete-button, addEventListener - устанвливает метод с для найденного элемента при событии click
 
   cardElement
@@ -64,7 +65,12 @@ export function makeCard(
 
   cardElement
     .querySelector(".card__like-button")
-    .addEventListener("click", functionLikeCard);
+    .addEventListener("click", likeButtonClicked);
+
+    if(hasMyLike(imgElement.likes))
+    {
+      switchLike(cardElement.querySelector(".card__like-button"), true)
+    }
 
   return cardElement;
 }
@@ -99,6 +105,7 @@ export function deleteCard(cardId,cardElement) {
 // функция лайка
 
 export function likeCard(evt) {
+
   if (!evt.target.classList.contains("card__like-button")) {
     return;
   }
@@ -107,9 +114,9 @@ export function likeCard(evt) {
 }
 
 
-export function likeCounter(cardData){
-    const likeCounter = document.querySelector(".card__likes-number");
-    likeCounter.textContent=cardData.likes.length;
+export function likeCounter(card, imgElement){
+    const likeCounter = card.querySelector(".card__likes-number");
+    likeCounter.textContent = imgElement.likes.length;
 }
 
 export function openConfirmPopup(evt){
@@ -129,5 +136,142 @@ export function openConfirmPopup(evt){
 deleteCard(imageId,card);
  });
   openPopup(popupConfirm);
+};
+
+function hasMyLike(cardLikes)
+{
+  const myId = getMyId();
+  return cardLikes.some((item)=> item._id === myId)
 }
 
+function isCardLiked(likeButton)
+{
+  return likeButton.classList.contains("card__like-button_is-active");
+}
+
+function switchLike(likeButton, position)
+{
+  if(position && !likeButton.classList.contains("card__like-button_is-active"))
+  {
+    likeButton.classList.add("card__like-button_is-active");
+  }
+  else
+  {
+    likeButton.classList.remove("card__like-button_is-active");
+  }
+}
+
+function likeButtonClicked(evt)
+{
+  const cardElement = evt.target.closest('.places__item');
+  const imgElement = cardElement.querySelector('.card__image');
+  const cardId = imgElement.id;
+  const cardLikes = imgElement.likes;
+
+  const hasMyLikeRes = hasMyLike(cardLikes)
+
+  if(!hasMyLikeRes)
+  {
+    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, { 
+      method: 'PUT',  
+      headers: {
+        authorization: "cc15c7c0-115a-417c-9697-eca1b1849815"
+      }
+    })
+    .then((res)=>{
+      if (res.ok) {
+        return res.json()}
+      })
+      .then((newCardData)=>{
+        imgElement.likes = newCardData.likes;
+        likeCounter(cardElement, imgElement);
+        if(hasMyLike(imgElement.likes)){
+          switchLike(cardElement.querySelector(".card__like-button"), true)
+        }
+        else{
+          switchLike(cardElement.querySelector(".card__like-button"), false)
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка при обновлении лайка:', error);
+      });
+  }
+  else{
+    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, {
+      method: 'DELETE',
+      headers: {
+        authorization: 'cc15c7c0-115a-417c-9697-eca1b1849815'
+      },
+    })
+    .then((res)=>{
+      if (res.ok) {
+        return res.json()}
+      })
+      .then((newCardData)=>{
+        imgElement.likes = newCardData.likes;
+        likeCounter(cardElement, imgElement);
+        if(hasMyLike(imgElement.likes)){
+          switchLike(cardElement.querySelector(".card__like-button"), true)
+        }
+        else{
+          switchLike(cardElement.querySelector(".card__like-button"), false)
+        }
+      })
+      .catch(error => {
+        console.error('Ошибка при обновлении лайка:', error);
+      });
+  }
+}
+
+function likeCardSwitch(evt){
+  const cardElement = evt.target.closest('.places__item');
+  const imgElement = cardElement.querySelector('.card__image');
+  const cardId =imgElement.id;
+  const cardLikes =imgElement.likes;
+
+  if(cardLikes.every((item)=>{item._id !== getMyId()}) ){
+
+    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, {
+      method: 'PUT',  
+      headers: {
+        authorization: "cc15c7c0-115a-417c-9697-eca1b1849815"
+      }
+    })
+
+    .then((res)=>{
+      if (res.ok) {
+        return res.json()}
+      })
+
+      .then((cardData)=>{
+        likeCounter(cardData);
+        cardLikes = cardData.likes;
+        likeCard();
+      })
+      .catch(error => {
+        console.error('Ошибка при обновлении лайка:', error);
+      });
+
+  } else {
+    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/${cardId}`, {
+      method: 'DELETE',
+      headers: {
+        authorization: 'cc15c7c0-115a-417c-9697-eca1b1849815'
+      },
+    })
+    .then((res)=>{
+      if (res.ok) {
+        return res.json()}
+      })
+
+      .then((cardData)=>{
+        likeCounter(cardData);
+        cardLikes = cardData.likes;
+        likeCard();
+      })
+      .catch(error => {
+        console.error('Ошибка при обновлении лайка:', error);
+      });
+  }
+
+}
