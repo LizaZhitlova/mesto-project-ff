@@ -11,7 +11,6 @@ const config = {
 };
 let myId;
 
-//#region Functions
 // загрузка данный о пользователе
 function getMyInfo() {
   return fetch(`${config.baseUrl}/users/me`, {
@@ -33,8 +32,6 @@ function handleResponse(res) {
   return Promise.reject(`Ошибка: ${res.status}`);
 }
 
-//#endregion
-
 export const getMyId = () => {
   return myId;
 };
@@ -46,9 +43,9 @@ export const deleteCardRequest = (cardId) => {
   }).then(handleResponse);
 };
 
-export const createCardRequest = (name, link,buttonElement) => {
-  const oginalButtonElement = buttonElement.textContent
-  buttonElement.textContent = 'Сохранение...';
+export const createCardRequest = (name, link, buttonElement) => {
+  const oginalButtonElement = buttonElement.textContent;
+  buttonElement.textContent = "Сохранение...";
   return fetch(`${config.baseUrl}/cards`, {
     method: "POST",
     headers: config.headers,
@@ -56,12 +53,13 @@ export const createCardRequest = (name, link,buttonElement) => {
       name: name,
       link: link, // URL, который ввел пользователь
     }),
-  }).then(handleResponse)
-  .finally(() => {
-    setTimeout(() => {
-    buttonElement.textContent = oginalButtonElement;
-  }, 1000);
-  });
+  })
+    .then(handleResponse)
+    .finally(() => {
+      setTimeout(() => {
+        buttonElement.textContent = oginalButtonElement;
+      }, 1000);
+    });
 };
 
 export const likeButtonRequest = (cardId, isSelected) => {
@@ -74,9 +72,9 @@ export const likeButtonRequest = (cardId, isSelected) => {
 
 // Редактирование профиля - сохранение обновлённых данных на сервере
 
-export const editProfileRequest = (name, job,buttonElement) => {
-  const oginalButtonElement = buttonElement.textContent
-  buttonElement.textContent = 'Сохранение...';
+export const editProfileRequest = (name, job, buttonElement) => {
+  const oginalButtonElement = buttonElement.textContent;
+  buttonElement.textContent = "Сохранение...";
   return fetch(`${config.baseUrl}/users/me`, {
     method: "PATCH",
     headers: config.headers,
@@ -84,17 +82,18 @@ export const editProfileRequest = (name, job,buttonElement) => {
       name: name,
       about: job,
     }),
-  }).then(handleResponse)
-  .finally(() => {
-    setTimeout(() => {
-    buttonElement.textContent = oginalButtonElement;
-  }, 1000);
-  });
+  })
+    .then(handleResponse)
+    .finally(() => {
+      setTimeout(() => {
+        buttonElement.textContent = oginalButtonElement;
+      }, 1000);
+    });
 };
 
-export const editProfileAvatarRequest = (avatar,buttonElement) => {
-const oginalButtonElement = buttonElement.textContent
-  buttonElement.textContent = 'Сохранение...';
+export const editProfileAvatarRequest = (avatar, buttonElement) => {
+  const oginalButtonElement = buttonElement.textContent;
+  buttonElement.textContent = "Сохранение...";
   return fetch(`${config.baseUrl}/users/me/avatar`, {
     method: "PATCH",
     headers: config.headers,
@@ -103,22 +102,12 @@ const oginalButtonElement = buttonElement.textContent
     }),
   })
     .then(handleResponse)
-    // .then((profile) => {
-    //   const newprofileAvatar = document.querySelector(".profile__image");
-    //   newprofileAvatar.style.backgroundImage = `url('${profile.avatar}')`;
-    // })
-    // .catch((error) => {
-    //   console.error("Ошибка при загрузке данных:", error);
-    //   alert("Не удалось обновить аваьар профиля");
-    // });
     .finally(() => {
       setTimeout(() => {
-      buttonElement.textContent = oginalButtonElement;
-    }, 1000);
+        buttonElement.textContent = oginalButtonElement;
+      }, 1000);
     });
-}
-
-//#region Init
+};
 // для загрузки каптикок с сервера нам необходимо запустить несколько промисов параллельно и получить и дождаться их выполнения
 // Promise.All принимаеи объект промисов
 Promise.all([getMyInfo(), getInitialCards()])
@@ -139,5 +128,3 @@ Promise.all([getMyInfo(), getInitialCards()])
   .catch((err) => {
     console.error("Ошибка при инициализации:", err);
   });
-
-//#endregion

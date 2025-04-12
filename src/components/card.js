@@ -6,16 +6,10 @@
 // возвращаемое значение:
 //  шаблон элемента списка
 
-import {
-  getMyId,
-  deleteCardRequest,
-  likeButtonRequest,
-  editProfileAvatarRequest,
-} from "./api.js";
-import { openPopup, popupClose } from "./modal.js";
-import { config, clearValidation } from "./validation.js";
+import { getMyId, deleteCardRequest, likeButtonRequest } from "./api.js";
+import { popupClose } from "./modal.js";
 
-let currentDeletedCard;
+export let currentDeletedCard;
 
 export function makeCard(cardData, functionConfirmPopup, functionOpenCardImg) {
   //в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
@@ -90,6 +84,13 @@ export function deleteCard(evt) {
     });
 }
 
+export const getcurrentDeletedCard = () => {
+  return currentDeletedCard;
+};
+export const setCurrentDeletedCard = (card) => {
+  currentDeletedCard = card;
+};
+
 // функция лайка
 export function likeCard(evt) {
   if (!evt.target.classList.contains("card__like-button")) {
@@ -102,63 +103,6 @@ export function likeCard(evt) {
 export function likeCounter(card, imgElement) {
   const likeCounter = card.querySelector(".card__likes-number");
   likeCounter.textContent = imgElement.likes.length;
-}
-/////// всё что не свяхано с карточной перенести
-export function openConfirmPopup(evt) {
-  if (!evt.target.classList.contains("card__delete-button")) {
-    return;
-  }
-  const cardElement = evt.target.closest(".places__item");
-
-  // Получаем элемент изображения внутри этой карточки
-  const imgElement = cardElement.querySelector(".card__image");
-  // Получаем ID изображения
-  const imageId = imgElement.id;
-  //const card = document.querySelector(".card");
-
-  const popupConfirm = document.querySelector(".popup_type_confirm");
-  currentDeletedCard = cardElement;
-  popupConfirm
-    .querySelector(".popup__button-confirm")
-    .addEventListener("click", deleteCard);
-  openPopup(popupConfirm);
-}
-// функция открытия попапа редактировать аватар
-
-export function openEditAvatarPopup(evt) {
-  if (!evt.target.classList.contains("profile__image")) {
-    return;
-  }
-  const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
-  popupEditAvatar
-    .querySelector(".popup__button-edit-avatar")
-    .addEventListener("click", editAvatarSubmit);
-   const formNewAvatar = popupEditAvatar.querySelector('[name ="edit-avatar"]');
-   clearValidation(formNewAvatar, config);
-   formNewAvatar.reset();
-   openPopup(popupEditAvatar);
-}
-
-//Функция отправки новой ссылки на аватар вызывается на кнопке сохранить
-function editAvatarSubmit(evt) {
-  evt.preventDefault();
-  const newAvatarInput = document.querySelector(
-    ".popup__input_type_url-avatar"
-  );
-  const newAvatarValue = newAvatarInput.value;
-  const buttonElement =evt.target;
-  editProfileAvatarRequest(newAvatarValue,buttonElement)
-    .then((profile) => {
-      const newprofileAvatar = document.querySelector(".profile__image");
-      newprofileAvatar.style.backgroundImage = `url('${profile.avatar}')`;
-      const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
-      popupClose(popupEditAvatar);
-      
-    })
-    .catch((error) => {
-      console.error("Ошибка при загрузке данных:", error);
-      alert("Не удалось обновить аваьар профиля");
-    });
 }
 
 function hasMyLike(cardLikes) {

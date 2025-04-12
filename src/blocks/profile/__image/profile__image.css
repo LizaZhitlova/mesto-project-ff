@@ -22,7 +22,6 @@
   }
 }
 
-
 .profile__image:hover::before {
   content: "";
   position: absolute;
@@ -30,11 +29,10 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8); 
+  background-color: rgba(0, 0, 0, 0.8);
   cursor: pointer;
 }
 
-/* Отдельный элемент для SVG */
 .profile__image::after {
   content: "";
   position: absolute;
@@ -52,5 +50,5 @@
 
 .profile__image:hover::after {
   opacity: 1;
-   cursor: pointer;
+  cursor: pointer;
 }

@@ -1,11 +1,11 @@
 import "./index.css"; // импорт главного файла стилей
+import { makeCard, likeCard } from "./components/card.js"; // импорт функций
 import {
-  makeCard,
-  likeCard,
-  openConfirmPopup,
+  openPopup,
+  popupClose,
   openEditAvatarPopup,
-} from "./components/card.js"; // импорт функций
-import { openPopup, popupClose } from "./components/modal.js"; //импорт функций
+  openConfirmPopup,
+} from "./components/modal.js"; //импорт функций
 import {
   enableValidation,
   config,
@@ -62,8 +62,8 @@ addButtOnopen.addEventListener("click", (evt) => {
   evt.preventDefault();
   const popupNewCard = document.querySelector(".popup_type_new-card"); // находим блок в котором лежит код папапа "Новое место" и присваиваем в переменную Popupnewcard
   const formNewPlace = document.querySelector('[name ="new-place"]');
-      formNewPlace.reset();
-      clearValidation(formNewPlace, config);
+  formNewPlace.reset();
+  clearValidation(formNewPlace, config);
   openPopup(popupNewCard);
 });
 
@@ -95,8 +95,8 @@ function handleFormSubmit(evt) {
   // Получите значение полей newNameInput  и newJobInput из свойства value
   const newNameValue = newNameInput.value;
   const newJobValue = newJobInput.value;
-  const buttonElement =evt.target.querySelector(".popup__button");
-  editProfileRequest(newNameValue, newJobValue,buttonElement)
+  const buttonElement = evt.target.querySelector(".popup__button");
+  editProfileRequest(newNameValue, newJobValue, buttonElement)
     .then((profile) => {
       const newprofileTitle = document.querySelector(".profile__title");
       const newprofileDescription = document.querySelector(
@@ -134,9 +134,7 @@ function editProfile(evt) {
   clearValidation(formEditProfile, config);
   openPopup(popupEdit);
 }
-
 // функция добавленя новой карточки на страницу
-//TODO почему в этом файле
 function newCardSubmit(evt) {
   evt.preventDefault();
   //находим поля формы в ДОМ
@@ -146,8 +144,8 @@ function newCardSubmit(evt) {
   //присваиваем им значения полей формы
   const newPlaceNameValue = newPlaceName.value;
   const newPlaceSrcValue = newPlaceSrc.value;
-  const buttonElement =evt.target.querySelector(".popup__button");
-  createCardRequest(newPlaceNameValue, newPlaceSrcValue,buttonElement)
+  const buttonElement = evt.target.querySelector(".popup__button");
+  createCardRequest(newPlaceNameValue, newPlaceSrcValue, buttonElement)
     .then((cardData) => {
       // Создаем и добавляем карточку на страницу
       const cardList = document.querySelector(".places__list"); //находим список где хранятся темплейты карточек
@@ -170,7 +168,6 @@ function newCardSubmit(evt) {
       );
     });
 }
-
 // в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
 // в переменную currentimg присваиваем значение элемента, на котором произошло событие
 // впеременных imglink и imgname получаем значения src и alt переменной currentim
@@ -193,6 +190,5 @@ function openCardIMG(evt) {
   const imagePopup = document.querySelector(".popup_type_image");
   openPopup(imagePopup);
 }
-
 // вывызваем функцию валидации полей
 enableValidation(config);
