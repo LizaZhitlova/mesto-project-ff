@@ -6,16 +6,18 @@
 // возвращаемое значение:
 //  шаблон элемента списка
 
-import { getMyId, deleteCardRequest, likeButtonRequest } from "./api.js";
+import {
+  getMyId,
+  deleteCardRequest,
+  likeButtonRequest,
+  editProfileAvatarRequest,
+} from "./api.js";
 import { openPopup, popupClose } from "./modal.js";
+import { config, clearValidation } from "./validation.js";
 
 let currentDeletedCard;
 
-export function makeCard(
-  cardData,
-  functionConfirmPopup,
-  functionOpenCardImg
-) {
+export function makeCard(cardData, functionConfirmPopup, functionOpenCardImg) {
   //в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
   // content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
   const cardTemplate = document.querySelector("#card-template").content;
@@ -31,7 +33,7 @@ export function makeCard(
   cardElement.querySelector(".card__title").textContent = cardData.name;
   const imgElement = cardElement.querySelector(".card__image");
   imgElement.src = cardData.link;
-  imgElement.alt =cardData.name;
+  imgElement.alt = cardData.name;
   imgElement.id = cardData._id;
   imgElement.likes = cardData.likes;
 
@@ -101,7 +103,7 @@ export function likeCounter(card, imgElement) {
   const likeCounter = card.querySelector(".card__likes-number");
   likeCounter.textContent = imgElement.likes.length;
 }
-
+/////// всё что не свяхано с карточной перенести
 export function openConfirmPopup(evt) {
   if (!evt.target.classList.contains("card__delete-button")) {
     return;
@@ -117,9 +119,45 @@ export function openConfirmPopup(evt) {
   const popupConfirm = document.querySelector(".popup_type_confirm");
   currentDeletedCard = cardElement;
   popupConfirm
-    .querySelector(".popup__button-confirm") // TODO вот ту идет подипска 
+    .querySelector(".popup__button-confirm")
     .addEventListener("click", deleteCard);
   openPopup(popupConfirm);
+}
+// функция открытия попапа редактировать аватар
+
+export function openEditAvatarPopup(evt) {
+  if (!evt.target.classList.contains("profile__image")) {
+    return;
+  }
+  const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
+  popupEditAvatar
+    .querySelector(".popup__button-edit-avatar")
+    .addEventListener("click", editAvatarSubmit);
+   const formNewAvatar = popupEditAvatar.querySelector('[name ="edit-avatar"]');
+   clearValidation(formNewAvatar, config);
+   formNewAvatar.reset();
+   openPopup(popupEditAvatar);
+}
+
+//Функция отправки новой ссылки на аватар вызывается на кнопке сохранить
+function editAvatarSubmit(evt) {
+  evt.preventDefault();
+  const newAvatarInput = document.querySelector(
+    ".popup__input_type_url-avatar"
+  );
+  const newAvatarValue = newAvatarInput.value;
+  editProfileAvatarRequest(newAvatarValue)
+    .then((profile) => {
+      const newprofileAvatar = document.querySelector(".profile__image");
+      newprofileAvatar.style.backgroundImage = `url('${profile.avatar}')`;
+      const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
+      popupClose(popupEditAvatar);
+      
+    })
+    .catch((error) => {
+      console.error("Ошибка при загрузке данных:", error);
+      alert("Не удалось обновить аваьар профиля");
+    });
 }
 
 function hasMyLike(cardLikes) {

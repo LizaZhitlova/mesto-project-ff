@@ -1,11 +1,9 @@
 import "./index.css"; // импорт главного файла стилей
-import { initialCards } from "./components/cards.js"; // импорт массива со ссылками на картинки
 import {
   makeCard,
-  deleteCard,
   likeCard,
-  likeCounter,
   openConfirmPopup,
+  openEditAvatarPopup,
 } from "./components/card.js"; // импорт функций
 import { openPopup, popupClose } from "./components/modal.js"; //импорт функций
 import {
@@ -13,7 +11,7 @@ import {
   config,
   clearValidation,
 } from "./components/validation.js";
-import {createCardRequest,editProfileRequest} from "./components/api.js";
+import { createCardRequest, editProfileRequest } from "./components/api.js";
 
 const editButtonOpen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
 const addButtOnopen = document.querySelector(".profile__add-button"); //находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
@@ -22,6 +20,7 @@ const popup = document.querySelectorAll(".popup");
 //находим формы в DOM
 const formEditProfile = document.querySelector('[name ="edit-profile"]');
 const formNewPlace = document.querySelector('[name ="new-place"]');
+const editAvatarOpen = document.querySelector(".profile__image");
 // Вывовд карточек  на страницу при загрузке
 
 //forEach передаётся функция, которая вызывается на каждом элементе массива.
@@ -36,16 +35,11 @@ const formNewPlace = document.querySelector('[name ="new-place"]');
 
 // функция вывода карточек с сервера
 
-export function appendCarsAPI(usersCars) {
-  usersCars.forEach(function (item) {
+export function appendCarsAPI(usersCards) {
+  usersCards.forEach(function (item) {
     // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
     //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
-    let appendCard = makeCard(
-      item,
-      openConfirmPopup,
-      openCardIMG,
-      likeCard
-    );
+    let appendCard = makeCard(item, openConfirmPopup, openCardIMG, likeCard);
     const cardList = document.querySelector(".places__list"); // список, в котором хранятся каточки, т.е в него записываются темплейты
     cardList.append(appendCard);
   });
@@ -61,10 +55,15 @@ formNewPlace.addEventListener("submit", newCardSubmit);
 // вешаем обработчик событий на кнопку редактировать профиль и в колбеке вызываем функцию OpenPopup
 editButtonOpen.addEventListener("click", editProfile);
 
+editAvatarOpen.addEventListener("click", openEditAvatarPopup);
+
 // вешаем обработчик событий на кнопку "+" и в колбеке вызываем функцию OpenPopup
 addButtOnopen.addEventListener("click", (evt) => {
   evt.preventDefault();
   const popupNewCard = document.querySelector(".popup_type_new-card"); // находим блок в котором лежит код папапа "Новое место" и присваиваем в переменную Popupnewcard
+  const formNewPlace = document.querySelector('[name ="new-place"]');
+      formNewPlace.reset();
+      clearValidation(formNewPlace, config);
   openPopup(popupNewCard);
 });
 
@@ -96,7 +95,19 @@ function handleFormSubmit(evt) {
   // Получите значение полей newNameInput  и newJobInput из свойства value
   const newNameValue = newNameInput.value;
   const newJobValue = newJobInput.value;
-  editProfileRequest(newNameValue,newJobValue);
+  editProfileRequest(newNameValue, newJobValue)
+    .then((profile) => {
+      const newprofileTitle = document.querySelector(".profile__title");
+      const newprofileDescription = document.querySelector(
+        ".profile__description"
+      );
+      newprofileTitle.textContent = profile.name;
+      newprofileDescription.textContent = profile.about;
+    })
+    .catch((error) => {
+      console.error("Ошибка при загрузке данных:", error);
+      alert("Не удалось загрузить данные профиля");
+    });
   // // Выберите элементы, куда должны быть вставлены значения полей. выбирвем элементы зголовка и параграфа на странице
   // const newprofileTitle = document.querySelector(".profile__title");
   // const newprofileDescription = document.querySelector(".profile__description");
@@ -141,11 +152,7 @@ function newCardSubmit(evt) {
       // const myId = getMyId();
       console.log("add card");
       console.log(cardData._id);
-      const newCard = makeCard(
-        cardData,
-        openConfirmPopup,
-        openCardIMG
-      );
+      const newCard = makeCard(cardData, openConfirmPopup, openCardIMG);
       cardList.prepend(newCard);
       // Закрываем попап и сбрасываем форму
       const popupNewPlace = document.querySelector(".popup_type_new-card");
