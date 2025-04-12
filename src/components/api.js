@@ -2,7 +2,7 @@
 
 import { appendCarsAPI } from "../index.js";
 
-let myId ;
+let myId;
 // реализация загрузки информации о пользователе
 
 fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
@@ -29,9 +29,8 @@ fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
     alert("Не удалось загрузить данные профиля");
   });
 
-
-export function getMyId (){
-    return myId;
+export function getMyId() {
+  return myId;
 }
 
 // загрузка начальных карточек  с сервера
@@ -99,7 +98,7 @@ fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
     alert("Не удалось загрузить данные профиля");
   });
 
-//   // Добавление новой карточки на страницу 
+//   // Добавление новой карточки на страницу
 
 //   fetch("https://nomoreparties.co/v1/wff-cohort-35/cards", {
 //     method: "POST",
@@ -120,7 +119,7 @@ fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
 //   })
 //   .then((data) => {
 //     console.log("Данные новой карточки:",data);
-    
+
 //   })
 //   .catch((error) => {
 //     console.error("Ошибка при загрузке данных:", error);

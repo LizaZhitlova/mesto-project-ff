@@ -6,8 +6,8 @@
 // возвращаемое значение:
 //  шаблон элемента списка
 
-import {getMyId} from "./api.js";
-import {openPopup,popupClose} from "./modal.js";
+import { getMyId } from "./api.js";
+import { openPopup, popupClose } from "./modal.js";
 
 export function makeCard(
   name,
@@ -16,8 +16,9 @@ export function makeCard(
   ownerId,
   cardId,
   functionConfirmPopup,
-  functionOpenCardImg) {
-  const myId= getMyId();
+  functionOpenCardImg
+) {
+  const myId = getMyId();
   //в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
   // content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
   const cardTemplate = document.querySelector("#card-template").content;
@@ -35,22 +36,24 @@ export function makeCard(
   imgElement.src = link;
   imgElement.alt = name;
   imgElement.id = cardId;
-  imgElement.likes=like;
+  imgElement.likes = like;
 
-  // делаем проверку если мой ID не совпадает ID владельца карточки - удаляем кнопку удаленя с карточки 
-  if(!(myId===ownerId)){
-    cardElement.querySelector(".card__delete-button").classList.add("card__delete-button-hidden");
-    }
-  
-    // работа с лайками 
-    const likesCounter = cardElement.querySelector(".card__likes-number");
-    // Устанавливаем начальное количество лайков
-    likesCounter.textContent = like.length;
+  // делаем проверку если мой ID не совпадает ID владельца карточки - удаляем кнопку удаленя с карточки
+  if (!(myId === ownerId)) {
+    cardElement
+      .querySelector(".card__delete-button")
+      .classList.add("card__delete-button-hidden");
+  }
 
-    if (like.length !== 0){
-      let a =5;
-    }
-   
+  // работа с лайками
+  const likesCounter = cardElement.querySelector(".card__likes-number");
+  // Устанавливаем начальное количество лайков
+  likesCounter.textContent = like.length;
+
+  if (like.length !== 0) {
+    let a = 5;
+  }
+
   // ищем элемент с классом .card__delete-button, addEventListener - устанвливает метод с для найденного элемента при событии click
 
   cardElement
@@ -67,45 +70,40 @@ export function makeCard(
     .querySelector(".card__like-button")
     .addEventListener("click", likeButtonClicked);
 
-    if(hasMyLike(imgElement.likes))
-    {
-      switchLike(cardElement.querySelector(".card__like-button"), true)
-    }
+  if (hasMyLike(imgElement.likes)) {
+    switchLike(cardElement.querySelector(".card__like-button"), true);
+  }
 
   return cardElement;
 }
 
 //Функция удаления карточки
 
-export function deleteCard(cardId,cardElement) {
-
+export function deleteCard(cardId, cardElement) {
   fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/${cardId}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
-      authorization: 'cc15c7c0-115a-417c-9697-eca1b1849815'
-    }
+      authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
+    },
   })
-  .then((res)=>{
-    if (res.ok) {
-      return res.json();
-  }else{
-    let i =10;
-  }
-})
-
- .then(()=>{
-  cardElement.remove();
-  const popupConfirm = document.querySelector(".popup_type_confirm")
-  popupClose(popupConfirm);
-})
-  .catch((error) => {
-    console.error("Ну удалось удалить карточку:", error);
-})
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+      // return Promise.reject(`Ошибка: ${res.status}`);
+    })
+    .then(() => {
+      cardElement.remove();
+      const popupConfirm = document.querySelector(".popup_type_confirm");
+      popupClose(popupConfirm);
+    })
+    .catch((error) => {
+      console.error("Ну удалось удалить карточку:", error);
+    });
 }
 // функция лайка
 
 export function likeCard(evt) {
-
   if (!evt.target.classList.contains("card__like-button")) {
     return;
   }
@@ -113,165 +111,103 @@ export function likeCard(evt) {
   console.log(evt.target);
 }
 
-
-export function likeCounter(card, imgElement){
-    const likeCounter = card.querySelector(".card__likes-number");
-    likeCounter.textContent = imgElement.likes.length;
+export function likeCounter(card, imgElement) {
+  const likeCounter = card.querySelector(".card__likes-number");
+  likeCounter.textContent = imgElement.likes.length;
 }
 
-export function openConfirmPopup(evt){
+export function openConfirmPopup(evt) {
   if (!evt.target.classList.contains("card__delete-button")) {
     return;
   }
-  const cardElement = evt.target.closest('.places__item');
-    
+  const cardElement = evt.target.closest(".places__item");
+
   // Получаем элемент изображения внутри этой карточки
-  const imgElement = cardElement.querySelector('.card__image');
+  const imgElement = cardElement.querySelector(".card__image");
   // Получаем ID изображения
   const imageId = imgElement.id;
   const card = document.querySelector(".card");
-  
- const popupConfirm = document.querySelector(".popup_type_confirm");
- popupConfirm.querySelector(".popup__button-confirm").addEventListener("click",(evt)=>{
-deleteCard(imageId,card);
- });
+
+  const popupConfirm = document.querySelector(".popup_type_confirm");
+  popupConfirm
+    .querySelector(".popup__button-confirm")
+    .addEventListener("click", (evt) => {
+      deleteCard(imageId, card);
+    });
   openPopup(popupConfirm);
-};
+}
 
-function hasMyLike(cardLikes)
-{
+function hasMyLike(cardLikes) {
   const myId = getMyId();
-  return cardLikes.some((item)=> item._id === myId)
+  return cardLikes.some((item) => item._id === myId);
 }
 
-function isCardLiked(likeButton)
-{
-  return likeButton.classList.contains("card__like-button_is-active");
-}
-
-function switchLike(likeButton, position)
-{
-  if(position && !likeButton.classList.contains("card__like-button_is-active"))
-  {
+function switchLike(likeButton, position) {
+  if (
+    position &&
+    !likeButton.classList.contains("card__like-button_is-active")
+  ) {
     likeButton.classList.add("card__like-button_is-active");
-  }
-  else
-  {
+  } else {
     likeButton.classList.remove("card__like-button_is-active");
   }
 }
 
-function likeButtonClicked(evt)
-{
-  const cardElement = evt.target.closest('.places__item');
-  const imgElement = cardElement.querySelector('.card__image');
+function likeButtonClicked(evt) {
+  const cardElement = evt.target.closest(".places__item");
+  const imgElement = cardElement.querySelector(".card__image");
   const cardId = imgElement.id;
   const cardLikes = imgElement.likes;
 
-  const hasMyLikeRes = hasMyLike(cardLikes)
+  const hasMyLikeRes = hasMyLike(cardLikes);
 
-  if(!hasMyLikeRes)
-  {
-    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, { 
-      method: 'PUT',  
-      headers: {
-        authorization: "cc15c7c0-115a-417c-9697-eca1b1849815"
-      }
-    })
-    .then((res)=>{
-      if (res.ok) {
-        return res.json()}
-      })
-      .then((newCardData)=>{
-        imgElement.likes = newCardData.likes;
-        likeCounter(cardElement, imgElement);
-        if(hasMyLike(imgElement.likes)){
-          switchLike(cardElement.querySelector(".card__like-button"), true)
-        }
-        else{
-          switchLike(cardElement.querySelector(".card__like-button"), false)
-        }
-      })
-      .catch(error => {
-        console.error('Ошибка при обновлении лайка:', error);
-      });
-  }
-  else{
+  if (!hasMyLikeRes) {
     fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, {
-      method: 'DELETE',
+      method: "PUT",
       headers: {
-        authorization: 'cc15c7c0-115a-417c-9697-eca1b1849815'
+        authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
       },
     })
-    .then((res)=>{
-      if (res.ok) {
-        return res.json()}
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
       })
-      .then((newCardData)=>{
+      .then((newCardData) => {
         imgElement.likes = newCardData.likes;
         likeCounter(cardElement, imgElement);
-        if(hasMyLike(imgElement.likes)){
-          switchLike(cardElement.querySelector(".card__like-button"), true)
+        if (hasMyLike(imgElement.likes)) {
+          switchLike(cardElement.querySelector(".card__like-button"), true);
+        } else {
+          switchLike(cardElement.querySelector(".card__like-button"), false);
         }
-        else{
-          switchLike(cardElement.querySelector(".card__like-button"), false)
-        }
       })
-      .catch(error => {
-        console.error('Ошибка при обновлении лайка:', error);
+      .catch((error) => {
+        console.error("Ошибка при обновлении лайка:", error);
       });
-  }
-}
-
-function likeCardSwitch(evt){
-  const cardElement = evt.target.closest('.places__item');
-  const imgElement = cardElement.querySelector('.card__image');
-  const cardId =imgElement.id;
-  const cardLikes =imgElement.likes;
-
-  if(cardLikes.every((item)=>{item._id !== getMyId()}) ){
-
-    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, {
-      method: 'PUT',  
-      headers: {
-        authorization: "cc15c7c0-115a-417c-9697-eca1b1849815"
-      }
-    })
-
-    .then((res)=>{
-      if (res.ok) {
-        return res.json()}
-      })
-
-      .then((cardData)=>{
-        likeCounter(cardData);
-        cardLikes = cardData.likes;
-        likeCard();
-      })
-      .catch(error => {
-        console.error('Ошибка при обновлении лайка:', error);
-      });
-
   } else {
-    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/${cardId}`, {
-      method: 'DELETE',
+    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, {
+      method: "DELETE",
       headers: {
-        authorization: 'cc15c7c0-115a-417c-9697-eca1b1849815'
+        authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
       },
     })
-    .then((res)=>{
-      if (res.ok) {
-        return res.json()}
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
       })
-
-      .then((cardData)=>{
-        likeCounter(cardData);
-        cardLikes = cardData.likes;
-        likeCard();
+      .then((newCardData) => {
+        imgElement.likes = newCardData.likes;
+        likeCounter(cardElement, imgElement);
+        if (hasMyLike(imgElement.likes)) {
+          switchLike(cardElement.querySelector(".card__like-button"), true);
+        } else {
+          switchLike(cardElement.querySelector(".card__like-button"), false);
+        }
       })
-      .catch(error => {
-        console.error('Ошибка при обновлении лайка:', error);
+      .catch((error) => {
+        console.error("Ошибка при обновлении лайка:", error);
       });
   }
-
 }

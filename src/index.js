@@ -1,8 +1,18 @@
 import "./index.css"; // импорт главного файла стилей
-import {initialCards} from "./components/cards.js"; // импорт массива со ссылками на картинки
-import {makeCard,deleteCard,likeCard,likeCounter,openConfirmPopup} from "./components/card.js"; // импорт функций
-import {openPopup,popupClose} from "./components/modal.js"; //импорт функций
-import {enableValidation,config,clearValidation} from "./components/validation.js";
+import { initialCards } from "./components/cards.js"; // импорт массива со ссылками на картинки
+import {
+  makeCard,
+  deleteCard,
+  likeCard,
+  likeCounter,
+  openConfirmPopup,
+} from "./components/card.js"; // импорт функций
+import { openPopup, popupClose } from "./components/modal.js"; //импорт функций
+import {
+  enableValidation,
+  config,
+  clearValidation,
+} from "./components/validation.js";
 import "./components/api.js";
 
 const editButtonOpen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
@@ -10,10 +20,8 @@ const addButtOnopen = document.querySelector(".profile__add-button"); //нахо
 const popupButtonClose = document.querySelectorAll(".popup__close"); // получаем коллекуию кнопок, которые закрывают попапы (крестик), коллекцию присваиваем переменной popupButtonClose
 const popup = document.querySelectorAll(".popup");
 //находим формы в DOM
-  const formEditProfile = document.querySelector('[name ="edit-profile"]');
-  const formNewPlace = document.querySelector('[name ="new-place"]');
-;
-
+const formEditProfile = document.querySelector('[name ="edit-profile"]');
+const formNewPlace = document.querySelector('[name ="new-place"]');
 // Вывовд карточек  на страницу при загрузке
 
 //forEach передаётся функция, которая вызывается на каждом элементе массива.
@@ -26,18 +34,26 @@ const popup = document.querySelectorAll(".popup");
 //   cardList.append(appendCard);
 // });
 
-// функция вывода карточек с сервера 
+// функция вывода карточек с сервера
 
-export function appendCarsAPI (usersCars){
-
+export function appendCarsAPI(usersCars) {
   usersCars.forEach(function (item) {
-  // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
-  //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
-  let appendCard = makeCard(item.name, item.link,item.likes,item.owner._id,item._id,openConfirmPopup,openCardIMG,likeCard);
-  const cardList = document.querySelector(".places__list"); // список, в котором хранятся каточки, т.е в него записываются темплейты
-  cardList.append(appendCard);
-})};
-
+    // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
+    //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
+    let appendCard = makeCard(
+      item.name,
+      item.link,
+      item.likes,
+      item.owner._id,
+      item._id,
+      openConfirmPopup,
+      openCardIMG,
+      likeCard
+    );
+    const cardList = document.querySelector(".places__list"); // список, в котором хранятся каточки, т.е в него записываются темплейты
+    cardList.append(appendCard);
+  });
+}
 
 // добавление новой карточки
 
@@ -73,14 +89,12 @@ popup.forEach(function (popupElement) {
 // он будет следить за событием “submit” - «отправка»
 formEditProfile.addEventListener("submit", handleFormSubmit);
 
-
-
 // Обработчик «отправки» формы, хотя пока
 // она никуда отправляться не будет
- function handleFormSubmit(evt) {
+function handleFormSubmit(evt) {
   //находим поля формы в DOM
-const newNameInput = document.querySelector(".popup__input_type_name"); // Воспользуйтесь инструментом .querySelector()
-const newJobInput = document.querySelector(".popup__input_type_description"); // Воспользуйтесь инструментом .querySelector()
+  const newNameInput = document.querySelector(".popup__input_type_name"); // Воспользуйтесь инструментом .querySelector()
+  const newJobInput = document.querySelector(".popup__input_type_description"); // Воспользуйтесь инструментом .querySelector()
   evt.preventDefault(); // Эта строчка отменяет стандартную отправку формы.
 
   // Получите значение полей newNameInput  и newJobInput из свойства value
@@ -93,10 +107,10 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
   newprofileTitle.textContent = newNameValue;
   newprofileDescription.textContent = newJobValue;
   popupClose();
-};
+}
 
 // функция редактирования профиля которая передаётся в колбек кнопки редактирования профиля
-  function editProfile (evt){
+function editProfile(evt) {
   evt.preventDefault();
   // при открытии формы поля «Имя» и «О себе» должны быть заполнены теми значениями, которые отображаются на странице.
   const profileTitle = document.querySelector(".profile__title"); // находим эелемнт в котором хранится имя
@@ -110,55 +124,62 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
   const formEditProfile = document.querySelector('[name ="edit-profile"]');
   clearValidation(formEditProfile, config);
   openPopup(popupEdit);
+}
 
+// функция добавленя новой карточки на страницу
 
-};
+function newCardSubmit(evt) {
+  evt.preventDefault();
+  //находим поля формы в ДОМ
+  const cardForm = evt.target;
+  const newPlaceName = cardForm.querySelector(".popup__input_type_card-name");
+  const newPlaceSrc = cardForm.querySelector(".popup__input_type_url");
+  //присваиваем им значения полей формы
+  const newPlaceNameValue = newPlaceName.value;
+  const newPlaceSrcValue = newPlaceSrc.value;
 
-  // функция добавленя новой карточки на страницу
-
-   function newCardSubmit (evt) {
-    evt.preventDefault();
-    //находим поля формы в ДОМ
-    const cardForm = evt.target;
-    const newPlaceName = cardForm.querySelector (".popup__input_type_card-name");
-    const newPlaceSrc = cardForm.querySelector (".popup__input_type_url");
-    //присваиваем им значения полей формы
-    const newPlaceNameValue = newPlaceName.value;
-    const newPlaceSrcValue = newPlaceSrc.value;
-
-    fetch('https://nomoreparties.co/v1/wff-cohort-35/cards', {
-      method: 'POST',
-      headers: {
-        authorization: 'cc15c7c0-115a-417c-9697-eca1b1849815',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: newPlaceNameValue ,
-        link: newPlaceSrcValue, // URL, который ввел пользователь
-      })
-    })
-    .then(res => {
+  fetch("https://nomoreparties.co/v1/wff-cohort-35/cards", {
+    method: "POST",
+    headers: {
+      authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: newPlaceNameValue,
+      link: newPlaceSrcValue, // URL, который ввел пользователь
+    }),
+  })
+    .then((res) => {
       return res.json();
     })
-    .then(cardData => {
+    .then((cardData) => {
       // Создаем и добавляем карточку на страницу
-      const cardList = document.querySelector('.places__list');//находим список где хранятся темплейты карточек
+      const cardList = document.querySelector(".places__list"); //находим список где хранятся темплейты карточек
       // const myId = getMyId();
-      const newCard = makeCard(cardData.name,cardData.link,cardData.likes,cardData.owner._id,cardData._id,openConfirmPopup,openCardIMG);
+      const newCard = makeCard(
+        cardData.name,
+        cardData.link,
+        cardData.likes,
+        cardData.owner._id,
+        cardData._id,
+        openConfirmPopup,
+        openCardIMG
+      );
       cardList.prepend(newCard);
       // Закрываем попап и сбрасываем форму
-      const popupNewPlace= document.querySelector(".popup_type_new-card")
+      const popupNewPlace = document.querySelector(".popup_type_new-card");
       popupClose(popupNewPlace);
       const formNewPlace = document.querySelector('[name ="new-place"]');
       formNewPlace.reset();
       clearValidation(formNewPlace, config);
     })
-    .catch(error => {
-      console.error('Ошибка при создании карточки:', error);
-      alert('Не удалось создать карточку. Проверьте URL изображения и попробуйте снова.');
+    .catch((error) => {
+      console.error("Ошибка при создании карточки:", error);
+      alert(
+        "Не удалось создать карточку. Проверьте URL изображения и попробуйте снова."
+      );
     });
-  };
-
+}
 
 // в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
 // в переменную currentimg присваиваем значение элемента, на котором произошло событие
@@ -167,23 +188,21 @@ const newJobInput = document.querySelector(".popup__input_type_description"); //
 // свойствам src и alt переменной IMG (т.е. нашей картинке ) присваиваем знаяения полученные в переменных imglink и imgname
 //ищем в документе элемент параграфа(т.е. названия картинки) и присываиваем значение в переменную IMGCaption
 // свойству .textContent переменной IMGCaption присваиваем значение полученное в imglink
- function openCardIMG(evt) {
-    if (!evt.target.classList.contains("card__image")) {
-      return;
-    }
-    const currentImg = evt.target;
-    const imgLink = currentImg.src;
-    const imgName = currentImg.alt;
-    const imgElement = document.querySelector(".popup__image");
-    imgElement.src = imgLink;
-    imgElement.alt = imgName;
-    const imgCaption = document.querySelector(".popup__caption");
-    imgCaption.textContent = imgName;
-    const imagePopup = document.querySelector(".popup_type_image");
-    openPopup(imagePopup);
-  };
+function openCardIMG(evt) {
+  if (!evt.target.classList.contains("card__image")) {
+    return;
+  }
+  const currentImg = evt.target;
+  const imgLink = currentImg.src;
+  const imgName = currentImg.alt;
+  const imgElement = document.querySelector(".popup__image");
+  imgElement.src = imgLink;
+  imgElement.alt = imgName;
+  const imgCaption = document.querySelector(".popup__caption");
+  imgCaption.textContent = imgName;
+  const imagePopup = document.querySelector(".popup_type_image");
+  openPopup(imagePopup);
+}
 
-  // вывызваем функцию валидации полей
-  enableValidation(config);
-
-  
+// вывызваем функцию валидации полей
+enableValidation(config);
