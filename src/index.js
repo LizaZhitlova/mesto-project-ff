@@ -13,7 +13,7 @@ import {
   config,
   clearValidation,
 } from "./components/validation.js";
-import {createCardRequest} from "./components/api.js";
+import {createCardRequest,editProfileRequest} from "./components/api.js";
 
 const editButtonOpen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
 const addButtOnopen = document.querySelector(".profile__add-button"); //находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
@@ -96,12 +96,13 @@ function handleFormSubmit(evt) {
   // Получите значение полей newNameInput  и newJobInput из свойства value
   const newNameValue = newNameInput.value;
   const newJobValue = newJobInput.value;
-  // Выберите элементы, куда должны быть вставлены значения полей. выбирвем элементы зголовка и параграфа на странице
-  const newprofileTitle = document.querySelector(".profile__title");
-  const newprofileDescription = document.querySelector(".profile__description");
-  // Вставьте новые значения с помощью textContent
-  newprofileTitle.textContent = newNameValue;
-  newprofileDescription.textContent = newJobValue;
+  editProfileRequest(newNameValue,newJobValue);
+  // // Выберите элементы, куда должны быть вставлены значения полей. выбирвем элементы зголовка и параграфа на странице
+  // const newprofileTitle = document.querySelector(".profile__title");
+  // const newprofileDescription = document.querySelector(".profile__description");
+  // // Вставьте новые значения с помощью textContent
+  // newprofileTitle.textContent = newNameValue;
+  // newprofileDescription.textContent = newJobValue;
   popupClose();
 }
 

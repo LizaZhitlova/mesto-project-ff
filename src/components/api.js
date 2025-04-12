@@ -65,6 +65,35 @@ export const likeButtonRequest = (cardId, isSelected) => {
   }).then(handleResponse);
 }
 
+// Редактирование профиля - сохранение обновлённых данных на сервере
+ 
+export function editProfileRequest(name,job){
+
+  fetch(`${config.baseUrl}/users/me`, {
+    method: "PATCH",
+    headers: config.headers,
+    body: JSON.stringify({
+      name: name,
+      about: job,
+    }),
+  })
+    .then((res) => {
+      if (res.ok) {
+        return res.json();
+      }
+    })
+    .then((profile) => {
+      const newprofileTitle = document.querySelector(".profile__title");
+      const newprofileDescription = document.querySelector(".profile__description");
+      newprofileTitle.textContent = profile.name;
+      newprofileDescription.textContent = profile.about;
+    })
+    .catch((error) => {
+      console.error("Ошибка при загрузке данных:", error);
+      alert("Не удалось загрузить данные профиля");
+    });
+  }
+
 //#region Init
 // для загрузки каптикок с сервера нам необходимо запустить несколько промисов параллельно и получить и дождаться их выполнения
 // Promise.All принимаеи объект промисов
@@ -87,29 +116,4 @@ Promise.all([getMyInfo(), getInitialCards()])
     console.error("Ошибка при инициализации:", err);
   });
 
-// Редактирование профиля - сохранение обновлённых данных на сервере
-// TODO отправлять данные из формы
-fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
-  method: "PATCH",
-  headers: {
-    authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    name: "Liza Zhitlova",
-    about: "Logist, foreign trade specialist",
-  }),
-})
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-  })
-  .then((data) => {
-    console.log(data);
-  })
-  .catch((error) => {
-    console.error("Ошибка при загрузке данных:", error);
-    alert("Не удалось загрузить данные профиля");
-  });
 //#endregion
