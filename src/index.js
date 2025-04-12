@@ -95,7 +95,8 @@ function handleFormSubmit(evt) {
   // Получите значение полей newNameInput  и newJobInput из свойства value
   const newNameValue = newNameInput.value;
   const newJobValue = newJobInput.value;
-  editProfileRequest(newNameValue, newJobValue)
+  const buttonElement =evt.target.querySelector(".popup__button");
+  editProfileRequest(newNameValue, newJobValue,buttonElement)
     .then((profile) => {
       const newprofileTitle = document.querySelector(".profile__title");
       const newprofileDescription = document.querySelector(
@@ -145,7 +146,8 @@ function newCardSubmit(evt) {
   //присваиваем им значения полей формы
   const newPlaceNameValue = newPlaceName.value;
   const newPlaceSrcValue = newPlaceSrc.value;
-  createCardRequest(newPlaceNameValue, newPlaceSrcValue)
+  const buttonElement =evt.target.querySelector(".popup__button");
+  createCardRequest(newPlaceNameValue, newPlaceSrcValue,buttonElement)
     .then((cardData) => {
       // Создаем и добавляем карточку на страницу
       const cardList = document.querySelector(".places__list"); //находим список где хранятся темплейты карточек

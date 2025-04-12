@@ -146,7 +146,8 @@ function editAvatarSubmit(evt) {
     ".popup__input_type_url-avatar"
   );
   const newAvatarValue = newAvatarInput.value;
-  editProfileAvatarRequest(newAvatarValue)
+  const buttonElement =evt.target;
+  editProfileAvatarRequest(newAvatarValue,buttonElement)
     .then((profile) => {
       const newprofileAvatar = document.querySelector(".profile__image");
       newprofileAvatar.style.backgroundImage = `url('${profile.avatar}')`;
