@@ -2,78 +2,93 @@
 
 import { appendCarsAPI } from "../index.js";
 
-let myId;
-// реализация загрузки информации о пользователе
-
-fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
+const config = {
+  baseUrl: "https://nomoreparties.co/v1/wff-cohort-35",
   headers: {
     authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
+    "Content-Type": "application/json",
   },
-})
-  .then((res) => {
-    if (res.ok) {
-      return res.json(); // возвращаем результат работы метода и идём в следующий then
-    }
-  })
-  .then((data) => {
-    // если мы попали в этот then, data — это объект, полученный в предыдущем промисе
-    console.log("Данные пользователя:", data);
-    document.querySelector(".profile__title").textContent = data.name;
-    document.querySelector(".profile__description").textContent = data.about;
-    // Вставляем ссылку на аватар в background-image
-    const avatarImage = document.querySelector(".profile__image");
-    avatarImage.style.backgroundImage = `url('${data.avatar}')`;
-  })
-  .catch((error) => {
-    console.error("Ошибка при загрузке данных:", error);
-    alert("Не удалось загрузить данные профиля");
-  });
+};
+let myId;
 
-export function getMyId() {
-  return myId;
+//#region Functions
+// загрузка данный о пользователе
+function getMyInfo() {
+  return fetch(`${config.baseUrl}/users/me`, {
+    headers: config.headers,
+  }).then(handleResponse);
 }
 
 // загрузка начальных карточек  с сервера
+const getInitialCards = () => {
+  return fetch(`${config.baseUrl}/cards`, {
+    headers: config.headers,
+  }).then(handleResponse);
+};
 
+function handleResponse(res) {
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`Ошибка: ${res.status}`);
+}
+
+//#endregion
+
+export const getMyId = () => {
+  return myId;
+};
+
+export const deleteCardRequest = (cardId) => {
+  return fetch(`${config.baseUrl}/cards/${cardId}`, {
+    method: "DELETE",
+    headers: config.headers,
+  }).then(handleResponse);
+}
+
+export const createCardRequest = (name, link) => {
+  return fetch(`${config.baseUrl}/cards`, {
+    method: "POST",
+    headers: config.headers,
+    body: JSON.stringify({
+      name: name,
+      link: link, // URL, который ввел пользователь
+    }),
+  }).then(handleResponse);
+}
+
+export const likeButtonRequest = (cardId, isSelected) => {
+  const command = isSelected ? "PUT" : "DELETE";
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+    method: command,
+    headers: config.headers,
+  }).then(handleResponse);
+}
+
+//#region Init
 // для загрузки каптикок с сервера нам необходимо запустить несколько промисов параллельно и получить и дождаться их выполнения
 // Promise.All принимаеи объект промисов
-Promise.all([
-  fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
-    headers: {
-      authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-    },
-  }),
-  fetch("https://nomoreparties.co/v1/wff-cohort-35/cards", {
-    headers: {
-      authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-    },
-  }),
-])
+Promise.all([getMyInfo(), getInitialCards()])
+  .then(([userData, cards]) => {
+    console.log("Пользователь:", userData);
+    console.log("Карточки:", cards);
 
-  // здесь мы получаем два обекта с данными массив карточек и информацию о пользователе включая Id
-  .then(([userIdRes, cardRes]) => {
-    if (userIdRes.ok || cardRes.ok) {
-      return Promise.all([userIdRes.json(), cardRes.json()]);
-    } else {
-      reject();
-    }
+    // Обновляем профиль
+    document.querySelector(".profile__title").textContent = userData.name;
+    document.querySelector(".profile__description").textContent =
+      userData.about;
+    document.querySelector(
+      ".profile__image"
+    ).style.backgroundImage = `url('${userData.avatar}')`;
+    myId = userData._id;
+    appendCarsAPI(cards);
   })
-  // если у нас оба запроса выполнились, то мы попадаем в следующий then, где вызываем функцию выведения карточек на страницу.
-  .then(([userIdData, cardData]) => {
-    // проверяем в косоли полученные обекты - в кончоли объекты появляются
-    console.log("Данные пользователя:", userIdData);
-    console.log("Загруженные карточки:", cardData);
-    myId = userIdData._id;
-    appendCarsAPI(cardData);
-  })
-
-  .catch((error) => {
-    console.error("Ошибка при загрузке данных:", error);
-    alert("Не удалось загрузить данные карточек");
+  .catch((err) => {
+    console.error("Ошибка при инициализации:", err);
   });
 
 // Редактирование профиля - сохранение обновлённых данных на сервере
-
+// TODO отправлять данные из формы
 fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
   method: "PATCH",
   headers: {
@@ -97,31 +112,4 @@ fetch("https://nomoreparties.co/v1/wff-cohort-35/users/me", {
     console.error("Ошибка при загрузке данных:", error);
     alert("Не удалось загрузить данные профиля");
   });
-
-//   // Добавление новой карточки на страницу
-
-//   fetch("https://nomoreparties.co/v1/wff-cohort-35/cards", {
-//     method: "POST",
-//     headers: {
-//       authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify({
-//       name: "Rail Intermodal",
-//       link: "https://t-magistral.ru/assets/images/f6a8603a1b2e7c2159589425342e4ec8_l(1).jpg",
-//     })
-// })
-
-// .then((res) => {
-//     if (res.ok) {
-//       return res.json();
-//     }
-//   })
-//   .then((data) => {
-//     console.log("Данные новой карточки:",data);
-
-//   })
-//   .catch((error) => {
-//     console.error("Ошибка при загрузке данных:", error);
-//     alert("Не удалось загрузить данные карточки");
-//   });
+//#endregion

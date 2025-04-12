@@ -13,7 +13,7 @@ import {
   config,
   clearValidation,
 } from "./components/validation.js";
-import "./components/api.js";
+import {createCardRequest} from "./components/api.js";
 
 const editButtonOpen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
 const addButtOnopen = document.querySelector(".profile__add-button"); //находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
@@ -41,11 +41,7 @@ export function appendCarsAPI(usersCars) {
     // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
     //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
     let appendCard = makeCard(
-      item.name,
-      item.link,
-      item.likes,
-      item.owner._id,
-      item._id,
+      item,
       openConfirmPopup,
       openCardIMG,
       likeCard
@@ -127,7 +123,7 @@ function editProfile(evt) {
 }
 
 // функция добавленя новой карточки на страницу
-
+//TODO почему в этом файле
 function newCardSubmit(evt) {
   evt.preventDefault();
   //находим поля формы в ДОМ
@@ -137,31 +133,15 @@ function newCardSubmit(evt) {
   //присваиваем им значения полей формы
   const newPlaceNameValue = newPlaceName.value;
   const newPlaceSrcValue = newPlaceSrc.value;
-
-  fetch("https://nomoreparties.co/v1/wff-cohort-35/cards", {
-    method: "POST",
-    headers: {
-      authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: newPlaceNameValue,
-      link: newPlaceSrcValue, // URL, который ввел пользователь
-    }),
-  })
-    .then((res) => {
-      return res.json();
-    })
+  createCardRequest(newPlaceNameValue, newPlaceSrcValue)
     .then((cardData) => {
       // Создаем и добавляем карточку на страницу
       const cardList = document.querySelector(".places__list"); //находим список где хранятся темплейты карточек
       // const myId = getMyId();
+      console.log("add card");
+      console.log(cardData._id);
       const newCard = makeCard(
-        cardData.name,
-        cardData.link,
-        cardData.likes,
-        cardData.owner._id,
-        cardData._id,
+        cardData,
         openConfirmPopup,
         openCardIMG
       );

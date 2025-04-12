@@ -96,7 +96,7 @@ const setEventListeners = (formElement) => {
 };
 
 // необходимо найти все формы на странице и добавить им слушателеи собыйтий для этого создаём функцию enableValidation
-export const enableValidation = (validationConfig) => {
+export const enableValidation = (config) => {
   // Найдём все формы с указанным классом в DOM,
   // сделаем из них массив методом Array.from
   const formList = Array.from(document.querySelectorAll(config.formSelector));
@@ -106,7 +106,7 @@ export const enableValidation = (validationConfig) => {
     formElement.addEventListener("submit", (evt) => {
       evt.preventDefault();
     });
-    // Для каждой формы вызовем функцию setEventListeners,
+    // Для каждой формы вызовем функцию setEventListeners, 
     // передав ей элемент формы
     setEventListeners(formElement);
   });

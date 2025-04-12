@@ -6,19 +6,16 @@
 // возвращаемое значение:
 //  шаблон элемента списка
 
-import { getMyId } from "./api.js";
+import { getMyId, deleteCardRequest, likeButtonRequest } from "./api.js";
 import { openPopup, popupClose } from "./modal.js";
 
+let currentDeletedCard;
+
 export function makeCard(
-  name,
-  link,
-  like,
-  ownerId,
-  cardId,
+  cardData,
   functionConfirmPopup,
   functionOpenCardImg
 ) {
-  const myId = getMyId();
   //в переменную cardTemplate присваивается содержимое элемента с идентификатором. querySelector - ищет элемент с идентификатором.
   // content - если найденный элемент это шаблон, то его содержимое доступно через это свойство content.
   const cardTemplate = document.querySelector("#card-template").content;
@@ -31,15 +28,15 @@ export function makeCard(
 
   //ищем элемент с классом .card__title, присваиваем приваиваем совйству элемента textContent значение аргумента name
 
-  cardElement.querySelector(".card__title").textContent = name;
+  cardElement.querySelector(".card__title").textContent = cardData.name;
   const imgElement = cardElement.querySelector(".card__image");
-  imgElement.src = link;
-  imgElement.alt = name;
-  imgElement.id = cardId;
-  imgElement.likes = like;
+  imgElement.src = cardData.link;
+  imgElement.alt =cardData.name;
+  imgElement.id = cardData._id;
+  imgElement.likes = cardData.likes;
 
   // делаем проверку если мой ID не совпадает ID владельца карточки - удаляем кнопку удаленя с карточки
-  if (!(myId === ownerId)) {
+  if (!(getMyId() === cardData.owner._id)) {
     cardElement
       .querySelector(".card__delete-button")
       .classList.add("card__delete-button-hidden");
@@ -48,11 +45,7 @@ export function makeCard(
   // работа с лайками
   const likesCounter = cardElement.querySelector(".card__likes-number");
   // Устанавливаем начальное количество лайков
-  likesCounter.textContent = like.length;
-
-  if (like.length !== 0) {
-    let a = 5;
-  }
+  likesCounter.textContent = cardData.likes.length;
 
   // ищем элемент с классом .card__delete-button, addEventListener - устанвливает метод с для найденного элемента при событии click
 
@@ -78,31 +71,24 @@ export function makeCard(
 }
 
 //Функция удаления карточки
-
-export function deleteCard(cardId, cardElement) {
-  fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/${cardId}`, {
-    method: "DELETE",
-    headers: {
-      authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-    },
-  })
-    .then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-      // return Promise.reject(`Ошибка: ${res.status}`);
-    })
+export function deleteCard(evt) {
+  const imgElement = currentDeletedCard.querySelector(".card__image");
+  const imageId = imgElement.id;
+  console.log("delete card");
+  console.log(imageId);
+  deleteCardRequest(imageId)
     .then(() => {
-      cardElement.remove();
-      const popupConfirm = document.querySelector(".popup_type_confirm");
-      popupClose(popupConfirm);
+      currentDeletedCard.remove();
+      currentDeletedCard = null;
+      popupClose();
     })
     .catch((error) => {
-      console.error("Ну удалось удалить карточку:", error);
+      currentDeletedCard = null;
+      console.error("Не удалось удалить карточку:", error);
     });
 }
-// функция лайка
 
+// функция лайка
 export function likeCard(evt) {
   if (!evt.target.classList.contains("card__like-button")) {
     return;
@@ -126,14 +112,13 @@ export function openConfirmPopup(evt) {
   const imgElement = cardElement.querySelector(".card__image");
   // Получаем ID изображения
   const imageId = imgElement.id;
-  const card = document.querySelector(".card");
+  //const card = document.querySelector(".card");
 
   const popupConfirm = document.querySelector(".popup_type_confirm");
+  currentDeletedCard = cardElement;
   popupConfirm
-    .querySelector(".popup__button-confirm")
-    .addEventListener("click", (evt) => {
-      deleteCard(imageId, card);
-    });
+    .querySelector(".popup__button-confirm") // TODO вот ту идет подипска 
+    .addEventListener("click", deleteCard);
   openPopup(popupConfirm);
 }
 
@@ -159,55 +144,17 @@ function likeButtonClicked(evt) {
   const cardId = imgElement.id;
   const cardLikes = imgElement.likes;
 
-  const hasMyLikeRes = hasMyLike(cardLikes);
+  const hasLike = hasMyLike(cardLikes);
+  const likeButton = cardElement.querySelector(".card__like-button");
 
-  if (!hasMyLikeRes) {
-    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, {
-      method: "PUT",
-      headers: {
-        authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-      },
+  // Вызываем нужный запрос: поставить или снять лайк
+  likeButtonRequest(cardId, !hasLike)
+    .then((newCardData) => {
+      imgElement.likes = newCardData.likes;
+      likeCounter(cardElement, imgElement);
+      switchLike(likeButton, hasMyLike(newCardData.likes));
     })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-      })
-      .then((newCardData) => {
-        imgElement.likes = newCardData.likes;
-        likeCounter(cardElement, imgElement);
-        if (hasMyLike(imgElement.likes)) {
-          switchLike(cardElement.querySelector(".card__like-button"), true);
-        } else {
-          switchLike(cardElement.querySelector(".card__like-button"), false);
-        }
-      })
-      .catch((error) => {
-        console.error("Ошибка при обновлении лайка:", error);
-      });
-  } else {
-    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, {
-      method: "DELETE",
-      headers: {
-        authorization: "cc15c7c0-115a-417c-9697-eca1b1849815",
-      },
-    })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-      })
-      .then((newCardData) => {
-        imgElement.likes = newCardData.likes;
-        likeCounter(cardElement, imgElement);
-        if (hasMyLike(imgElement.likes)) {
-          switchLike(cardElement.querySelector(".card__like-button"), true);
-        } else {
-          switchLike(cardElement.querySelector(".card__like-button"), false);
-        }
-      })
-      .catch((error) => {
-        console.error("Ошибка при обновлении лайка:", error);
-      });
-  }
+    .catch((error) => {
+      console.error("Ошибка при обновлении лайка:", error);
+    });
 }
