@@ -5,7 +5,7 @@ import {
   setCurrentDeletedCard,
   deleteCard,
 } from "./card.js";
-
+import { popupConfirm } from "../index.js";
 // в файл modal.js помещаем функции отвечающе за работу попапов
 
 let currentOpenedPopup = null; //создаём переменную currentOpenedPopup, данная переменная будет хранить текущий открытй попап.
@@ -42,43 +42,6 @@ function closeByEsc(evt) {
     popupClose();
   }
 }
-
-// функция открытия попапа редактировать аватар
-
-export function openEditAvatarPopup(evt) {
-  if (!evt.target.classList.contains("profile__image")) {
-    return;
-  }
-  const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
-  popupEditAvatar
-    .querySelector(".popup__button-edit-avatar")
-    .addEventListener("click", editAvatarSubmit);
-  const formNewAvatar = popupEditAvatar.querySelector('[name ="edit-avatar"]');
-  clearValidation(formNewAvatar, config);
-  formNewAvatar.reset();
-  openPopup(popupEditAvatar);
-}
-
-//Функция отправки новой ссылки на аватар вызывается на кнопке сохранить
-function editAvatarSubmit(evt) {
-  evt.preventDefault();
-  const newAvatarInput = document.querySelector(
-    ".popup__input_type_url-avatar"
-  );
-  const newAvatarValue = newAvatarInput.value;
-  const buttonElement = evt.target;
-  editProfileAvatarRequest(newAvatarValue, buttonElement)
-    .then((profile) => {
-      const newprofileAvatar = document.querySelector(".profile__image");
-      newprofileAvatar.style.backgroundImage = `url('${profile.avatar}')`;
-      const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
-      popupClose(popupEditAvatar);
-    })
-    .catch((error) => {
-      console.error("Ошибка при загрузке данных:", error);
-      alert("Не удалось обновить аваьар профиля");
-    });
-}
 // функция открытия попапа удаления карточки
 export function openConfirmPopup(evt) {
   if (!evt.target.classList.contains("card__delete-button")) {
@@ -90,12 +53,12 @@ export function openConfirmPopup(evt) {
   const imgElement = cardElement.querySelector(".card__image");
   // Получаем ID изображения
   const imageId = imgElement.id;
+  openPopup(popupConfirm);
   //const card = document.querySelector(".card");
 
-  const popupConfirm = document.querySelector(".popup_type_confirm");
-  setCurrentDeletedCard(cardElement);
-  popupConfirm
-    .querySelector(".popup__button-confirm")
-    .addEventListener("click", deleteCard);
-  openPopup(popupConfirm);
+  // setCurrentDeletedCard(cardElement);
+  // popupConfirm
+  //   .querySelector(".popup__button-confirm")
+  //   .addEventListener("click", deleteCard);
+
 }
