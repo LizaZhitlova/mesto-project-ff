@@ -1,10 +1,4 @@
-import { editProfileAvatarRequest } from "./api.js";
-import { clearValidation, config } from "./validation.js";
-import {
-  getcurrentDeletedCard,
-  setCurrentDeletedCard,
-  deleteCard,
-} from "./card.js";
+import { setCurrentDeletedCard, deleteCard } from "./card.js";
 import { popupConfirm } from "../index.js";
 // в файл modal.js помещаем функции отвечающе за работу попапов
 
@@ -49,16 +43,15 @@ export function openConfirmPopup(evt) {
   }
   const cardElement = evt.target.closest(".places__item");
 
-  // Получаем элемент изображения внутри этой карточки
+  // // Получаем элемент изображения внутри этой карточки
   const imgElement = cardElement.querySelector(".card__image");
-  // Получаем ID изображения
-  const imageId = imgElement.id;
+  // // Получаем ID изображения
+  // const imageId = imgElement.id;
   openPopup(popupConfirm);
-  //const card = document.querySelector(".card");
+  const card = document.querySelector(".card");
 
-  // setCurrentDeletedCard(cardElement);
-  // popupConfirm
-  //   .querySelector(".popup__button-confirm")
-  //   .addEventListener("click", deleteCard);
-
+  setCurrentDeletedCard(cardElement);
+  popupConfirm
+    .querySelector(".popup__button-confirm")
+    .addEventListener("click", deleteCard);
 }

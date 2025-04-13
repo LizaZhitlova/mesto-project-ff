@@ -1,140 +1,133 @@
 // в данном файле описана логика валидации форм
 
-//объект настроек
-export const config = {
-  inputErrorClass: ".type_error",
-  inputErrorSelector: "type_error",
-  errorMassageClass: ".popup_input-error_active",
-  errorMassageSelector: "popup_input-error_active",
-  inputSelector: ".popup__input",
-  submitButtonSelector: ".popup__button",
-  formSelector: ".popup__form",
-  submitButtonErrorClass: "popup__button_inactive",
-};
+
 // функции валидации
 
-//Эта функция должна принимать как параметры DOM-элемент формы, для которой очищаются ошибки валидации и объект с настройками валидации. Используйте функцию clearValidation при заполнении формы профиля во время её открытия и при очистке формы добавления карточки.
-export function clearValidation(formElement, validationConfig) {
-  const errorElements = formElement.querySelectorAll(
-    validationConfig.errorMassageClass
-  );
-  errorElements.forEach(function (errorElement) {
-    errorElement.classList.remove(validationConfig.errorMassageSelector);
-    errorElement.textContent = "";
-  });
-  const inputElements = formElement.querySelectorAll(
-    validationConfig.inputErrorClass
-  );
-  inputElements.forEach(function (inputElement) {
-    inputElement.classList.remove(validationConfig.inputErrorSelector);
-  });
-
-  const submitButton = formElement.querySelector(
-    validationConfig.submitButtonSelector
-  );
-  submitButton.disabled = true;
-  submitButton.classList.add(validationConfig.submitButtonErrorClass);
+// Вынесение дублирующегося кода в функции
+function getErrorElement(formElement, inputElement) {
+  return formElement.querySelector(`.${inputElement.id}-error`);
 }
 
-// показывает элемент ошибки, подсвечивает поле с ошибкой
-function showInputError(formElement, inputElement, errorMessage) {
-  const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-  inputElement.classList.add(config.inputErrorSelector);
-  errorElement.textContent = errorMessage;
-  errorElement.classList.add(config.errorMassageSelector);
-}
-//скрывает элемент ошибки
-function hideInputError(formElement, inputElement) {
-  const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-  inputElement.classList.remove(config.inputErrorSelector);
-  errorElement.classList.remove(config.errorMassageSelector);
-  errorElement.textContent = "";
-}
-//проверяет валидность поля, внутри вызывает showInputError или hideInputError.
-function isValid(formElement, inputElement) {
-  // проверяем связана ли ошибка с регулярным выражением чререз втроенное свойство patternMismatch
-  if (inputElement.validity.patternMismatch) {
-    // данные атрибута доступны у элемента инпута через ключевое слово dataset.
-    inputElement.setCustomValidity(inputElement.dataset.errorMessage);
+function toggleErrorClass(element, className, isAdd) {
+  if (isAdd) {
+    element.classList.add(className);
   } else {
-    inputElement.setCustomValidity("");
+    element.classList.remove(className);
+  }
+}
+
+function setErrorContent(errorElement, message) {
+  errorElement.textContent = message;
+}
+
+function setInputValidity(inputElement, message = "") {
+  inputElement.setCustomValidity(message);
+}
+
+// Функции валидации
+export function clearValidation(formElement, config) {
+  const errorElements = formElement.querySelectorAll(config.errorMassageClass);
+  errorElements.forEach((errorElement) => {
+    toggleErrorClass(errorElement, config.errorMassageSelector, false);
+    setErrorContent(errorElement, "");
+  });
+
+  const inputElements = formElement.querySelectorAll(config.inputErrorClass);
+  inputElements.forEach((inputElement) => {
+    toggleErrorClass(inputElement, config.inputErrorSelector, false);
+    setInputValidity(inputElement);
+  });
+
+  const submitButton = formElement.querySelector(config.submitButtonSelector);
+  toggleSubmitButton(submitButton, config, true);
+}
+
+function showInputError(formElement, inputElement, errorMessage, config) {
+  const errorElement = getErrorElement(formElement, inputElement);
+  toggleErrorClass(inputElement, config.inputErrorSelector, true);
+  setErrorContent(errorElement, errorMessage);
+  toggleErrorClass(errorElement, config.errorMassageSelector, true);
+}
+
+function hideInputError(formElement, inputElement, config) {
+  const errorElement = getErrorElement(formElement, inputElement);
+  toggleErrorClass(inputElement, config.inputErrorSelector, false);
+  toggleErrorClass(errorElement, config.errorMassageSelector, false);
+  setErrorContent(errorElement, "");
+  setInputValidity(inputElement);
+}
+
+function isValid(formElement, inputElement, config) {
+  if (inputElement.validity.patternMismatch) {
+    setInputValidity(inputElement, inputElement.dataset.errorMessage);
+  } else {
+    setInputValidity(inputElement);
   }
 
   if (!inputElement.validity.valid) {
-    // Если поле не проходит валидацию, покажем ошибку
-    showInputError(formElement, inputElement, inputElement.validationMessage);
+    showInputError(
+      formElement,
+      inputElement,
+      inputElement.validationMessage,
+      config
+    );
   } else {
-    // Если проходит, скроем
-    hideInputError(formElement, inputElement);
+    hideInputError(formElement, inputElement, config);
   }
 }
 
-//gусть слушатель событий добавится всем полям ввода внутри формы. Для этого создадим функцию setEventListeners,
-// которая примет параметром элемент формы и добавит её полям нужные обработчики:
-const setEventListeners = (formElement) => {
-  // Находим все поля внутри формы,
-  // сделаем из них массив методом Array.from
+// Функции для работы с кнопкой
+function toggleSubmitButton(buttonElement, config, isDisabled) {
+  buttonElement.disabled = isDisabled;
+  toggleErrorClass(buttonElement, config.submitButtonErrorClass, isDisabled);
+}
+
+function hasInvalidInput(inputList) {
+  return inputList.some((inputElement) => !inputElement.validity.valid);
+}
+
+function toggleButtonState(inputList, buttonElement, config) {
+  const hasInvalid = hasInvalidInput(inputList);
+  toggleSubmitButton(buttonElement, config, hasInvalid);
+}
+
+// Функции для настройки обработчиков событий
+function setupInputEventListener(
+  formElement,
+  inputElement,
+  buttonElement,
+  config
+) {
+  inputElement.addEventListener("input", () => {
+    isValid(formElement, inputElement, config);
+    toggleButtonState(
+      Array.from(formElement.querySelectorAll(config.inputSelector)),
+      buttonElement,
+      config
+    );
+  });
+}
+
+const setEventListeners = (formElement, config) => {
   const inputList = Array.from(
     formElement.querySelectorAll(config.inputSelector)
   );
-  // находим кнопку в текущей форме
   const buttonElement = formElement.querySelector(config.submitButtonSelector);
-  //   // вызываем toggleButtonState до начала ввода данных, чтоы бы конпка была не активной при открытии пустой формы
-  toggleButtonState(inputList, buttonElement);
-  // Обойдём все элементы полученной коллекции
-  inputList.forEach((inputElement) => {
-    // каждому полю добавим обработчик события input
-    inputElement.addEventListener("input", () => {
-      // Внутри колбэка вызовем isValid,
-      // передав ей форму и проверяемый элемент
-      isValid(formElement, inputElement);
 
-      // Вызовем toggleButtonState и передадим ей массив полей и кнопку
-      toggleButtonState(inputList, buttonElement);
-    });
+  toggleButtonState(inputList, buttonElement, config);
+
+  inputList.forEach((inputElement) => {
+    setupInputEventListener(formElement, inputElement, buttonElement, config);
   });
 };
 
-// необходимо найти все формы на странице и добавить им слушателеи собыйтий для этого создаём функцию enableValidation
 export const enableValidation = (config) => {
-  // Найдём все формы с указанным классом в DOM,
-  // сделаем из них массив методом Array.from
   const formList = Array.from(document.querySelectorAll(config.formSelector));
 
-  // Переберём полученную коллекцию
   formList.forEach((formElement) => {
     formElement.addEventListener("submit", (evt) => {
-      evt.preventDefault();
+      // Обработка submit
     });
-    // Для каждой формы вызовем функцию setEventListeners, 
-    // передав ей элемент формы
-    setEventListeners(formElement);
+    setEventListeners(formElement, config);
   });
-};
-
-// настраиваем кнопку
-
-// создадим функцию hasInvalidInput, которая принимает массив inputov перебирает каждый его элемент  и возвращать false , если все input валидные и true, если хотя бы один не валидный.
-
-function hasInvalidInput(inputList) {
-  // проходим по этому массиву методом some
-  return inputList.some((inputElement) => {
-    // Если поле не валидно, колбэк вернёт true
-    // Обход массива прекратится и вся функция
-    // hasInvalidInput вернёт true
-    return !inputElement.validity.valid;
-  });
-}
-// для изменения сатуса кнопки напишем функцию toggleButtonState, которая отключает и включает кнопку. Фнкция принимает на фход массив импутов и элемент кнопки
-const toggleButtonState = (inputList, buttonElement) => {
-  // Если есть хотя бы один невалидный инпут
-  if (hasInvalidInput(inputList)) {
-    // сделай кнопку неактивной
-    buttonElement.disabled = true;
-    buttonElement.classList.add(config.submitButtonErrorClass);
-  } else {
-    // иначе сделай кнопку активной
-    buttonElement.disabled = false;
-    buttonElement.classList.remove(config.submitButtonErrorClass);
-  }
 };

@@ -1,30 +1,40 @@
 import "./index.css"; // импорт главного файла стилей
-import { makeCard, likeCard,deleteCard } from "./components/card.js"; // импорт функций
+import { makeCard, likeCard } from "./components/card.js";
+import { openPopup, popupClose, openConfirmPopup } from "./components/modal.js";
+import { enableValidation, clearValidation } from "./components/validation.js";
 import {
-  openPopup,
-  popupClose,
-  openConfirmPopup,
-} from "./components/modal.js"; //импорт функций
-import {
-  enableValidation,
-  config,
-  clearValidation,
-} from "./components/validation.js";
-import { createCardRequest, editProfileRequest,editProfileAvatarRequest } from "./components/api.js";
+  createCardRequest,
+  editProfileRequest,
+  editProfileAvatarRequest,
+  getMyInfo,
+  getInitialCards,
+  promiseAllRequest,
+} from "./components/api.js";
 
-const editButtonOpen = document.querySelector(".profile__edit-button"); // находим кнопку, которая открываем попап, который редактирует профиль значение присваиваем переменной editButtonopen
-const addButtOnopen = document.querySelector(".profile__add-button"); //находим кнопку, которая открываем попап, который добаляет новое место занчение присваиваем в переменную addButtonopen
-const popupButtonClose = document.querySelectorAll(".popup__close"); // получаем коллекуию кнопок, которые закрывают попапы (крестик), коллекцию присваиваем переменной popupButtonClose
+export const config = {
+  inputErrorClass: ".type_error",
+  inputErrorSelector: "type_error",
+  errorMassageClass: ".popup_input-error_active",
+  errorMassageSelector: "popup_input-error_active",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  formSelector: ".popup__form",
+  submitButtonErrorClass: "popup__button_inactive",
+};
+
+// находим элементы в DOM
+const editButtonOpen = document.querySelector(".profile__edit-button");
+const addButtOnopen = document.querySelector(".profile__add-button");
+const popupButtonClose = document.querySelectorAll(".popup__close");
 const popup = document.querySelectorAll(".popup");
-//находим формы в DOM
 const formEditProfile = document.querySelector('[name ="edit-profile"]');
 const formNewPlace = document.querySelector('[name ="new-place"]');
 const editAvatarOpen = document.querySelector(".profile__image");
-const popupNewCard = document.querySelector(".popup_type_new-card"); // находим блок в котором лежит код папапа "Новое место" и присваиваем в переменную Popupnewcard
-const nameInput = document.querySelector(".popup__input_type_name"); // Воспользуйтесь инструментом .querySelector()
-const jobInput = document.querySelector(".popup__input_type_description"); // Воспользуйтесь инструментом .querySelector()
+const popupNewCard = document.querySelector(".popup_type_new-card");
+const nameInput = document.querySelector(".popup__input_type_name");
+const jobInput = document.querySelector(".popup__input_type_description");
 const profileTitle = document.querySelector(".profile__title");
-const profileDescription = document.querySelector( ".profile__description");
+const profileDescription = document.querySelector(".profile__description");
 const popupEdit = document.querySelector(".popup_type_edit");
 const newPlaceName = document.querySelector(".popup__input_type_card-name");
 const newPlaceSrc = document.querySelector(".popup__input_type_url");
@@ -35,17 +45,6 @@ const imagePopup = document.querySelector(".popup_type_image");
 const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
 const formNewAvatar = popupEditAvatar.querySelector('[name ="edit-avatar"]');
 export const popupConfirm = document.querySelector(".popup_type_confirm");
-// Вывовд карточек  на страницу при загрузке
-
-//forEach передаётся функция, которая вызывается на каждом элементе массива.
-//в качестве агрумента функции присваивается текущий элемент массива - item.
-// initialCards.forEach(function (item) {
-//   // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
-//   //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
-//   let appendCard = makeCard(item.name, item.link,deleteCard,openCardIMG,likeCard);
-//   const cardList = document.querySelector(".places__list"); // список, в котором хранятся каточки, т.е в него записываются темплейты
-//   cardList.append(appendCard);
-// });
 
 // функция вывода карточек с сервера
 
@@ -105,16 +104,19 @@ function formEditProfileSubmit(evt) {
   const newNameValue = nameInput.value;
   const newJobValue = jobInput.value;
   const buttonElement = evt.target.querySelector(".popup__button");
-  editProfileRequest(newNameValue, newJobValue, buttonElement)
+  const oginalButtonElement = buttonElement.textContent;
+  buttonElement.textContent = "Сохранение...";
+  editProfileRequest(newNameValue, newJobValue)
     .then((profile) => {
       profileTitle.textContent = profile.name;
       profileDescription.textContent = profile.about;
-      popupClose();//Закрытие форм при сабмите нужно производить в методе then цепочки промисов обработки ответа сервера, так как форма должна закрыться только после прихода успешного ответа от сервера и заполнения элементов страницы информацией 
+      popupClose(); //Закрытие форм при сабмите нужно производить в методе then цепочки промисов обработки ответа сервера, так как форма должна закрыться только после прихода успешного ответа от сервера и заполнения элементов страницы информацией
     })
     .catch((error) => {
       console.error("Ошибка при загрузке данных:", error);
       alert("Не удалось загрузить данные профиля");
-    });
+    })
+    .finally(restoreButtonText(buttonElement, oginalButtonElement));
 }
 
 // функция редактирования профиля которая передаётся в колбек кнопки редактирования профиля
@@ -130,13 +132,13 @@ function editProfile(evt) {
 // функция добавленя новой карточки на страницу
 function newCardSubmit(evt) {
   evt.preventDefault();
-  //находим поля формы в ДОМ
-  const cardForm = evt.target;
   //присваиваем им значения полей формы
   const newPlaceNameValue = newPlaceName.value;
   const newPlaceSrcValue = newPlaceSrc.value;
   const buttonElement = evt.target.querySelector(".popup__button");
-  createCardRequest(newPlaceNameValue, newPlaceSrcValue, buttonElement)
+  const oginalButtonElement = buttonElement.textContent;
+  buttonElement.textContent = "Сохранение...";
+  createCardRequest(newPlaceNameValue, newPlaceSrcValue)
     .then((cardData) => {
       // Создаем и добавляем карточку на страницу
       console.log("add card");
@@ -153,7 +155,8 @@ function newCardSubmit(evt) {
       alert(
         "Не удалось создать карточку. Проверьте URL изображения и попробуйте снова."
       );
-    });
+    })
+    .finally(restoreButtonText(buttonElement, oginalButtonElement));
 }
 // в функции OpenCardIMG делаем проверку если элемент по на котором произошло событие не сожержит класс .card__image - прекрашаем функцию
 // в переменную currentimg присваиваем значение элемента, на котором произошло событие
@@ -176,7 +179,7 @@ function openCardIMG(evt) {
 }
 
 // функция открытия попапа редактировать аватар
-  function openEditAvatarPopup(evt) {
+function openEditAvatarPopup(evt) {
   if (!evt.target.classList.contains("profile__image")) {
     return;
   }
@@ -196,7 +199,9 @@ function editAvatarSubmit(evt) {
   );
   const newAvatarValue = newAvatarInput.value;
   const buttonElement = evt.target;
-  editProfileAvatarRequest(newAvatarValue, buttonElement)
+  const oginalButtonElement = buttonElement.textContent;
+  buttonElement.textContent = "Сохранение...";
+  editProfileAvatarRequest(newAvatarValue)
     .then((profile) => {
       editAvatarOpen.style.backgroundImage = `url('${profile.avatar}')`;
       popupClose(popupEditAvatar);
@@ -204,11 +209,23 @@ function editAvatarSubmit(evt) {
     .catch((error) => {
       console.error("Ошибка при загрузке данных:", error);
       alert("Не удалось обновить аваьар профиля");
-    });
+    })
+    .finally(restoreButtonText(buttonElement, oginalButtonElement));
 }
 
 // вывызваем функцию валидации полей
 enableValidation(config);
 
-popupConfirm.querySelector(".popup__button-confirm").addEventListener("click", deleteCard);
- 
+// возврат исходного текста кнопки сабмита
+
+function restoreButtonText(buttonElement, oginalButtonElement) {
+  setTimeout(() => {
+    buttonElement.textContent = oginalButtonElement;
+  }, 1000);
+}
+// вызов Promise.all
+Promise.all([getMyInfo(), getInitialCards()])
+  .then(promiseAllRequest)
+  .catch((err) => {
+    console.error("Ошибка при инициализации:", err);
+  });
