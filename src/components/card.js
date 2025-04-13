@@ -121,7 +121,7 @@ function switchLike(likeButton, position) {
   }
 }
 
-function likeButtonClicked(evt) {
+function likeButtonClicked(evt) {//TODO В обработчик лайка карточки на 7-м спринте нужно, кроме id карточки, передавать как параметры элемент кнопки лайка и элемент, показывающий количество лайков, чтобы в обработчике не было повторного поиска этих элементов.
   const cardElement = evt.target.closest(".places__item");
   const imgElement = cardElement.querySelector(".card__image");
   const cardId = imgElement.id;
