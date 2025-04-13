@@ -51,7 +51,4 @@ export function openConfirmPopup(evt) {
   const card = document.querySelector(".card");
 
   setCurrentDeletedCard(cardElement);
-  popupConfirm
-    .querySelector(".popup__button-confirm")
-    .addEventListener("click", deleteCard);//TODO Обработчик deleteCard нужно добавить один раз при загрузке страницы (в глобальной области видимости в index.js), а не при каждом открытии попапа.
 }

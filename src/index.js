@@ -1,5 +1,5 @@
 import "./index.css"; // импорт главного файла стилей
-import { makeCard, likeCard } from "./components/card.js";
+import { makeCard, likeCard, deleteCard } from "./components/card.js";
 import { openPopup, popupClose, openConfirmPopup } from "./components/modal.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
 import {
@@ -45,6 +45,9 @@ const imagePopup = document.querySelector(".popup_type_image");
 const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
 const formNewAvatar = popupEditAvatar.querySelector('[name ="edit-avatar"]');
 export const popupConfirm = document.querySelector(".popup_type_confirm");
+popupConfirm
+  .querySelector(".popup__button-confirm")
+  .addEventListener("click", deleteCard);
 
 // функция вывода карточек с сервера
 

@@ -49,15 +49,12 @@ export function makeCard(cardData, functionConfirmPopup, functionOpenCardImg) {
     .querySelector(".card__delete-button")
     .addEventListener("click", functionConfirmPopup);
 
-  // возвращаем перменную содержащую шаблон элемента списка
-
   cardElement
     .querySelector(".card__image")
     .addEventListener("click", functionOpenCardImg);
 
-  cardElement
-    .querySelector(".card__like-button")
-    .addEventListener("click", likeButtonClicked);
+  const cardLikeButton =cardElement.querySelector(".card__like-button");
+  cardLikeButton.addEventListener("click", () => likeButtonClicked(imgElement.id, cardLikeButton, cardElement, imgElement, imgElement.likes));
 
   if (hasMyLike(imgElement.likes)) {
     switchLike(cardElement.querySelector(".card__like-button"), true);
@@ -121,17 +118,9 @@ function switchLike(likeButton, position) {
   }
 }
 
-function likeButtonClicked(evt) {//TODO В обработчик лайка карточки на 7-м спринте нужно, кроме id карточки, передавать как параметры элемент кнопки лайка и элемент, показывающий количество лайков, чтобы в обработчике не было повторного поиска этих элементов.
-  const cardElement = evt.target.closest(".places__item");
-  const imgElement = cardElement.querySelector(".card__image");
-  const cardId = imgElement.id;
-  const cardLikes = imgElement.likes;
-
-  const hasLike = hasMyLike(cardLikes);
-  const likeButton = cardElement.querySelector(".card__like-button");
-
+function likeButtonClicked(cardId, likeButton, cardElement, imgElement, cardLikes) {
   // Вызываем нужный запрос: поставить или снять лайк
-  likeButtonRequest(cardId, !hasLike)
+  likeButtonRequest(cardId, !hasMyLike(cardLikes))
     .then((newCardData) => {
       imgElement.likes = newCardData.likes;
       likeCounter(cardElement, imgElement);
