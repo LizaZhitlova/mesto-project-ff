@@ -6,8 +6,9 @@
 // возвращаемое значение:
 //  шаблон элемента списка
 
-import { getMyId, deleteCardRequest, likeButtonRequest } from "./api.js";
+import { deleteCardRequest, likeButtonRequest } from "./api.js";
 import { popupClose } from "./modal.js";
+import { getMyId} from "../index.js";
 
 export let currentDeletedCard;
 

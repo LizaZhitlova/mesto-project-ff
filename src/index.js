@@ -7,7 +7,7 @@ import {
   editProfileRequest,
   editProfileAvatarRequest,
   getMyInfo,
-  getInitialCards,promiseAllRequest
+  getInitialCards
 } from "./components/api.js";
 
 export const config = {
@@ -44,13 +44,15 @@ const imagePopup = document.querySelector(".popup_type_image");
 const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
 const formNewAvatar = popupEditAvatar.querySelector('[name ="edit-avatar"]');
 const popupConfirm = document.querySelector(".popup_type_confirm");
+let myId;
+
 popupConfirm
   .querySelector(".popup__button-confirm")
   .addEventListener("click", deleteCard);
 
 // функция вывода карточек с сервера
 
-export function appendCarsAPI(usersCards) {
+export function appendCardsAPI(usersCards) {
   usersCards.forEach(function (item) {
     // функция переданная в метод forEach вызывает функцию makeCard, которой переданы агрумены:
     //item.name - элемент массива со сзначением name,item.link - элемент массива со значением link, функция deleteCard- выполняющая удаление карточки
@@ -223,14 +225,33 @@ enableValidation(config);
 function restoreButtonText(buttonElement, oginalButtonElement) {
   setTimeout(() => {
     buttonElement.textContent = oginalButtonElement;
-  }, 1000);
+  }, 1500);
 }
+
+export const getMyId = () => {
+  return myId;
+  }
+
 // вызов Promise.all
 Promise.all([getMyInfo(), getInitialCards()])
   .then(promiseAllRequest)
   .catch((err) => {
     console.error("Ошибка при инициализации:", err);
   });
+
+  function promiseAllRequest([userData, cards]) {
+    console.log("Пользователь:", userData);
+    console.log("Карточки:", cards);
+  
+    // Обновляем профиль
+    document.querySelector(".profile__title").textContent = userData.name;
+    document.querySelector(".profile__description").textContent = userData.about;
+    document.querySelector(
+      ".profile__image"
+    ).style.backgroundImage = `url('${userData.avatar}')`;
+    myId = userData._id;
+    appendCardsAPI(cards);
+  }
 
 // функция открытия попапа удаления карточки
     function openConfirmPopup(evt) {
@@ -246,3 +267,4 @@ Promise.all([getMyInfo(), getInitialCards()])
   
     setCurrentDeletedCard(cardElement);
   }
+ 

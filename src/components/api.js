@@ -1,7 +1,4 @@
 // файл для запросов на сервер
-
-import { appendCarsAPI } from "../index.js";
-
 const config = {
   baseUrl: "https://nomoreparties.co/v1/wff-cohort-35",
   headers: {
@@ -32,10 +29,6 @@ export const getInitialCards = () => {
   return fetch(`${config.baseUrl}/cards`, {
     headers: config.headers,
   }).then(handleResponse);
-};
-
-export const getMyId = () => {
-  return myId;
 };
 
 export const deleteCardRequest = (cardId) => {
@@ -85,21 +78,4 @@ export const editProfileAvatarRequest = (avatar) => {
       avatar: avatar,
     }),
   }).then(handleResponse);
-};
-
-//TODO  Не могу перенести этот запрос в index.js , 
-//так как опять не понимаю как мы получаем myId, проблема именно в этом, уже сто раз проверила
-// пробовала делать вызов  getMyId () внутри запроса, всё равно не получается 
-export const promiseAllRequest = ([userData, cards]) => {
-  console.log("Пользователь:", userData);
-  console.log("Карточки:", cards);
-
-  // Обновляем профиль
-  document.querySelector(".profile__title").textContent = userData.name;
-  document.querySelector(".profile__description").textContent = userData.about;
-  document.querySelector(
-    ".profile__image"
-  ).style.backgroundImage = `url('${userData.avatar}')`;
-  myId = userData._id;
-  appendCarsAPI(cards);
 };
