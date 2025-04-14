@@ -1,14 +1,13 @@
 import "./index.css"; // импорт главного файла стилей
-import { makeCard, likeCard, deleteCard } from "./components/card.js";
-import { openPopup, popupClose, openConfirmPopup } from "./components/modal.js";
+import { makeCard, likeCard, deleteCard,setCurrentDeletedCard} from "./components/card.js";
+import { openPopup, popupClose} from "./components/modal.js";  
 import { enableValidation, clearValidation } from "./components/validation.js";
 import {
   createCardRequest,
   editProfileRequest,
   editProfileAvatarRequest,
   getMyInfo,
-  getInitialCards,
-  promiseAllRequest,
+  getInitialCards,promiseAllRequest
 } from "./components/api.js";
 
 export const config = {
@@ -26,7 +25,7 @@ export const config = {
 const editButtonOpen = document.querySelector(".profile__edit-button");
 const addButtOnopen = document.querySelector(".profile__add-button");
 const popupButtonClose = document.querySelectorAll(".popup__close");
-const popup = document.querySelectorAll(".popup");
+const popupList = document.querySelectorAll(".popup");
 const formEditProfile = document.querySelector('[name ="edit-profile"]');
 const formNewPlace = document.querySelector('[name ="new-place"]');
 const editAvatarOpen = document.querySelector(".profile__image");
@@ -44,7 +43,7 @@ const imgCaption = document.querySelector(".popup__caption");
 const imagePopup = document.querySelector(".popup_type_image");
 const popupEditAvatar = document.querySelector(".popup_type_edit-avatar");
 const formNewAvatar = popupEditAvatar.querySelector('[name ="edit-avatar"]');
-export const popupConfirm = document.querySelector(".popup_type_confirm");
+const popupConfirm = document.querySelector(".popup_type_confirm");
 popupConfirm
   .querySelector(".popup__button-confirm")
   .addEventListener("click", deleteCard);
@@ -88,7 +87,7 @@ popupButtonClose.forEach(function (popupElement) {
 
 //плавное открытие попапа
 // методом  forEach перебираем коллекцию кнопок, лежащую в popup для кажой добавлеям класс .popup_is-animated
-popup.forEach(function (popupElement) {
+popupList.forEach(function (popupElement) {
   popupElement.classList.add("popup_is-animated");
 });
 
@@ -232,3 +231,18 @@ Promise.all([getMyInfo(), getInitialCards()])
   .catch((err) => {
     console.error("Ошибка при инициализации:", err);
   });
+
+// функция открытия попапа удаления карточки
+    function openConfirmPopup(evt) {
+    if (!evt.target.classList.contains("card__delete-button")) {
+      return;
+    }
+    const cardElement = evt.target.closest(".places__item");
+  
+    // // Получаем элемент изображения внутри этой карточки
+    const imgElement = cardElement.querySelector(".card__image");
+    openPopup(popupConfirm);
+    const card = document.querySelector(".card");
+  
+    setCurrentDeletedCard(cardElement);
+  }

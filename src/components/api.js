@@ -9,7 +9,9 @@ const config = {
     "Content-Type": "application/json",
   },
 };
-let myId;
+ 
+  // let myId;
+  export let myId;
 
 function handleResponse(res) {
   if (res.ok) {
@@ -84,6 +86,10 @@ export const editProfileAvatarRequest = (avatar) => {
     }),
   }).then(handleResponse);
 };
+
+//TODO  Не могу перенести этот запрос в index.js , 
+//так как опять не понимаю как мы получаем myId, проблема именно в этом, уже сто раз проверила
+// пробовала делать вызов  getMyId () внутри запроса, всё равно не получается 
 export const promiseAllRequest = ([userData, cards]) => {
   console.log("Пользователь:", userData);
   console.log("Карточки:", cards);

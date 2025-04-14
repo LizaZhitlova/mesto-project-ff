@@ -1,5 +1,3 @@
-import { setCurrentDeletedCard, deleteCard } from "./card.js";
-import { popupConfirm } from "../index.js";
 // в файл modal.js помещаем функции отвечающе за работу попапов
 
 let currentOpenedPopup = null; //создаём переменную currentOpenedPopup, данная переменная будет хранить текущий открытй попап.
@@ -35,20 +33,4 @@ function closeByEsc(evt) {
   if (evt.key === "Escape") {
     popupClose();
   }
-}
-// функция открытия попапа удаления карточки
-export function openConfirmPopup(evt) {
-  if (!evt.target.classList.contains("card__delete-button")) {
-    return;
-  }
-  const cardElement = evt.target.closest(".places__item");
-
-  // // Получаем элемент изображения внутри этой карточки
-  const imgElement = cardElement.querySelector(".card__image");
-  // // Получаем ID изображения
-  // const imageId = imgElement.id;
-  openPopup(popupConfirm);
-  const card = document.querySelector(".card");
-
-  setCurrentDeletedCard(cardElement);
 }
